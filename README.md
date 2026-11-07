@@ -31,6 +31,16 @@ A rewrite inspired by [Arcify](https://github.com/nisargkolhe/arcify) (GPL-3.0),
   <kbd>⌘K</kbd>/<kbd>Ctrl+K</kbd>, or <kbd>/</kbd>.
 - **Import from Arc.** Settings → Import from Arc reads Arc's `StorableSidebar.json` and brings over your Spaces, their
   colors, pinned tabs, folders and favorites. The file never leaves your computer.
+- **Recent tab switcher (prototype).** Enable it in Settings → Recent tabs, then assign forward and backward shortcuts
+  in Keyboard shortcuts → Cycle through preview. Hold the modifier and press again to cycle through five recent open
+  tabs across Spaces in this window. All preview shortcuts start unassigned. An unassigned action has no implicit Shift binding.
+  The first press selects the same tab in either direction. Direction affects further presses while the modifier stays held.
+  Newly opened background tabs take priority, so opening a link with Cmd/Ctrl+click makes it the next selection.
+  A centered preview highlights the selection; releasing the modifier switches to it.
+  Escape cancels. Record a close shortcut in the same settings subsection to close the highlighted tab without switching
+  to it; you can also hover and close a preview with its close button. Chrome reserves Cmd+W for closing the current tab,
+  so it cannot be used here.
+  Website access is optional; local screenshots appear after you visit tabs and stay in worker memory.
 
 Spaces, pins, folders and favorites live in your bookmarks (an "Other bookmarks → Volet" folder), so they sync across
 your computers with Chrome sync and survive reinstalling. Space colors and settings sync through Chrome too. Nothing is
@@ -42,10 +52,15 @@ sent anywhere else: see the [privacy policy](PRIVACY.md).
 | --- | --- |
 | Show or hide the sidebar | <kbd>Alt</kbd>+<kbd>S</kbd> |
 | Search tabs, pins and archived tabs | <kbd>Alt</kbd>+<kbd>T</kbd> |
+| Cycle through recent tabs forward (opt-in) | not set |
+| Cycle through recent tabs backward | not set |
+| Close highlighted preview tab | not set, record in Volet settings |
 | Next / previous Space | not set |
 | Pin or unpin the current tab | <kbd>Alt</kbd>+<kbd>P</kbd> |
 
-Change them in `chrome://extensions/shortcuts` (Settings has a link).
+Change native shortcuts in `chrome://extensions/shortcuts` (Settings has a link). Record and clear the preview-only close
+shortcut in Volet settings, including the modifier you hold while cycling. This device-local shortcut works only while
+the preview is open.
 
 ### Limits of a Chrome extension
 
@@ -53,6 +68,8 @@ Change them in `chrome://extensions/shortcuts` (Settings has a link).
   vertical tabs can replace it if you prefer.
 - The side panel's width and side are set by Chrome.
 - The palette can't appear on Chrome's own pages (`chrome://`, the Web Store); there it opens in the sidebar instead.
+- The recent tab switcher cannot overlay Chrome pages or the Web Store: its shortcut switches directly to the previous
+  tab there. Modifier-release selection requires focus in a website; address-bar and browser UI focus are limited by Chrome.
 - Arc's Split View, Peek and Little Arc aren't possible.
 
 ## Install

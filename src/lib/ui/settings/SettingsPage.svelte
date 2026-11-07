@@ -3,6 +3,8 @@
   import Button from '../primitives/page/Button.svelte';
   import Card from '../primitives/page/Card.svelte';
   import PageShell from '../primitives/page/PageShell.svelte';
+  import RecentTabsSettings from './RecentTabsSettings.svelte';
+  import KeyboardShortcutsSettings from './KeyboardShortcutsSettings.svelte';
 
   const settings = new SettingsStore();
   void settings.load();
@@ -16,6 +18,8 @@
     { hours: 0, label: 'Never close them' },
   ];
 </script>
+
+<svelte:window onfocus={() => void settings.refreshShortcuts()} />
 
 <PageShell title="Settings">
   <Card title="Archiving">
@@ -44,19 +48,9 @@
     </div>
   </Card>
 
-  <Card title="Keyboard shortcuts">
-    <dl class="flex flex-col">
-      {#each settings.shortcuts as shortcut (shortcut.name)}
-        <div class="flex h-9 items-center justify-between gap-3 text-[14px]">
-          <dt>{shortcut.description}</dt>
-          <dd class={shortcut.keys ? 'font-medium' : 'text-ink-muted'}>{shortcut.keys || 'Not set'}</dd>
-        </div>
-      {/each}
-    </dl>
-    <div class="mt-4 flex justify-end">
-      <Button onclick={() => void settings.editShortcuts()}>Change shortcuts</Button>
-    </div>
-  </Card>
+  <RecentTabsSettings />
+
+  <KeyboardShortcutsSettings shortcuts={settings.shortcuts} onedit={() => void settings.editShortcuts()} />
 
   <Card title="Import">
     <div class="flex items-center justify-between gap-3">

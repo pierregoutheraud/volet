@@ -1,0 +1,144 @@
+/* Only generate the utilities needed by the shared favicon inside this shadow root. */
+@import 'tailwindcss' source(none);
+@import '../../../styles/theme.css';
+@source '../primitives/Favicon.svelte';
+
+:host { all: initial; }
+
+.recent-tabs-root {
+  --ink-muted: #a1a1a6;
+  --rule: #ffffff12;
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  display: grid;
+  place-items: center;
+  color: #e7e7e8;
+  font: 12px/1.35 system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.recent-tabs-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+}
+
+.recent-tabs-dialog {
+  position: relative;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  padding: 12px;
+  border: 1px solid #ffffff1c;
+  border-radius: 22px;
+  background: #191a1b;
+  box-shadow: 0 16px 48px #0005, 0 4px 12px #0003;
+}
+
+.recent-tabs-list {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.recent-tab-card { position: relative; flex: 0 0 156px; min-width: 0; }
+
+.recent-tab {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 10px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.recent-tab[data-selected='true'] { background: #595a5b; color: #fff; }
+.recent-tab:focus-visible { outline: 2px solid #ffffffa6; outline-offset: -2px; }
+
+.recent-tab-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid #ffffff24;
+  border-radius: 50%;
+  background: #202124e6;
+  color: #eee;
+  opacity: 0;
+  pointer-events: none;
+  cursor: pointer;
+}
+.recent-tab-card[data-selected='true'] .recent-tab-close,
+.recent-tab-card:focus-within .recent-tab-close { opacity: 1; pointer-events: auto; }
+.recent-tab-close:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+.recent-tab-preview {
+  height: 90px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #25272a;
+  box-shadow: 0 0 0 1px #0000001a;
+}
+
+.recent-tab-screenshot { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+.recent-tab-placeholder {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at 35% 20%, #41464c, #282c31 75%);
+}
+
+.recent-tab-placeholder-icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 1px solid #ffffff12;
+  border-radius: 13px;
+  background: #ffffff0a;
+  color: #c9cdd3;
+  box-shadow: 0 2px 8px #00000014;
+}
+
+.recent-tab-caption {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  height: 16px;
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+.recent-tab-title { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+.recent-tabs-announcement {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .recent-tab:not([data-selected='true']):hover { background: #ffffff0a; }
+  .recent-tab-card:hover .recent-tab-close { opacity: 1; pointer-events: auto; }
+  .recent-tab-close:hover { background: #454649; }
+}

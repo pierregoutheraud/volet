@@ -92,6 +92,49 @@ test('the settings page changes how long unpinned tabs stay open', async ({ cont
   await expect(page.getByText('Change shortcuts')).toBeVisible();
 });
 
+test('both tab cycling directions are listed in settings and independently configurable in Chrome', async ({ context, worker }) => {
+  const page = await context.newPage();
+  await page.goto(extensionPage(worker, 'options.html'));
+  const preview = page.getByRole('region', { name: 'Cycle through preview', exact: true });
+  await expect(preview.getByText('Cycle through recent tabs forward', { exact: true })).toBeVisible();
+  await expect(preview.getByText('Cycle through recent tabs backward', { exact: true })).toBeVisible();
+  await expect(preview.locator('dd')).toHaveText(['Not set', 'Not set']);
+  await expect(preview.getByRole('button', { name: 'Set close highlighted tab shortcut' })).toHaveText('Not set');
+  for (const name of ['General', 'Volets', 'Tabs']) await expect(page.getByRole('region', { name, exact: true })).toBeVisible();
+  const opened = context.waitForEvent('page');
+  await page.getByRole('button', { name: 'Change shortcuts' }).click();
+  const shortcuts = await opened;
+  await shortcuts.waitForLoadState();
+  await expect(shortcuts).toHaveURL('chrome://extensions/shortcuts');
+  await expect(shortcuts.getByText('Cycle through recent tabs forward', { exact: true })).toBeVisible();
+  await expect(shortcuts.getByText('Cycle through recent tabs backward', { exact: true })).toBeVisible();
+});
+
+test('the preview close shortcut can be recorded, persisted, cancelled and cleared', async ({ context, worker }) => {
+  const page = await context.newPage();
+  await page.goto(extensionPage(worker, 'options.html'));
+  const recorder = page.getByRole('button', { name: 'Set close highlighted tab shortcut' });
+  await recorder.click();
+  await recorder.press('Meta+Backspace');
+  await expect(recorder).toHaveText('Cmd+Backspace');
+  await expect.poll(() => worker.evaluate(async () => (await chrome.storage.local.get('previewCloseShortcut')).previewCloseShortcut))
+    .toBe('Cmd+Backspace');
+  await page.reload();
+  await expect(recorder).toHaveText('Cmd+Backspace');
+  await recorder.click();
+  await recorder.press('Escape');
+  await expect(recorder).toHaveText('Cmd+Backspace');
+  await recorder.click();
+  // Dispatch locally: a real Cmd+W would close this browser tab before the recorder could see it.
+  await recorder.dispatchEvent('keydown', { key: 'w', code: 'KeyW', metaKey: true });
+  await expect(page.getByRole('alert')).toHaveText('Chrome reserves this shortcut. Choose another combination.');
+  await recorder.press('Escape');
+  await page.getByRole('button', { name: 'Clear close highlighted tab shortcut' }).click();
+  await expect(recorder).toHaveText('Not set');
+  await page.reload();
+  await expect(recorder).toHaveText('Not set');
+});
+
 test('idle tabs are archived, and the palette reopens them', async ({ worker, windowId, panel }) => {
   test.setTimeout(90_000);
   const tabId = await worker.evaluate(

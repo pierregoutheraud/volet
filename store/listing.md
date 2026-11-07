@@ -147,16 +147,20 @@ When the user presses the search shortcut, the search palette opens over the pag
 `scripting`
 
 ```
-Injects the search palette into the current page when the user presses its shortcut (together with activeTab, so only that page and only then). The palette is part of the extension package; no remote code.
+Injects the search palette into the current page when the user presses its shortcut. With optional website access, also preloads the recent tab switcher's keyboard release listener and overlay on websites. All scripts are part of the extension package; no remote code.
 ```
 
-**Host permissions**: none. (The manifest makes `_favicon/*` web accessible so the in-page search palette can show
-site icons from Chrome's favicon cache; it grants no access to pages.)
+**Required host permissions**: none. (The manifest makes `_favicon/*` web accessible so the in-page search palette
+can show site icons from Chrome's favicon cache; it grants no access to pages.)
+
+**Optional host permissions**: `<all_urls>`, requested only when enabling the recent tab switcher in settings.
+Website access preloads a shortcut modifier release listener, renders the centered switcher, and captures visible
+page previews as tabs are visited. At most ten screenshots stay in worker memory, never synced or uploaded.
 
 **Are you using remote code?** No, I am not using remote code.
 
-**Data usage**, what user data is collected: check **Web history** only. (Volet reads tab titles, addresses and
-last-use times and keeps archived tabs, all on the device. Chrome's policy counts local handling, so it's
+**Data usage**, what user data is collected: check **Web history** and **Website content**. (Volet reads tab titles,
+addresses and last-use times, keeps archived tabs, and optionally captures page previews, all on the device. Chrome's policy counts local handling, so it's
 disclosed even though nothing is transmitted.)
 
 Certify all three:

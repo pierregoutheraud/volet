@@ -37,6 +37,8 @@ export default defineConfig({
       'activeTab',
       'scripting',
     ],
+    // Opt-in tab switcher: preload release listeners and capture local page previews as tabs are used.
+    optional_host_permissions: ['<all_urls>'],
     // The in-page palette shows favicons from Chrome's cache, served from the extension's origin.
     web_accessible_resources: [{ resources: ['_favicon/*'], matches: ['<all_urls>'] }],
     // An action is required so clicking the toolbar icon can open the side panel.
@@ -44,6 +46,10 @@ export default defineConfig({
     commands: {
       'toggle-sidebar': { suggested_key: { default: 'Alt+S' }, description: 'Show or hide the sidebar' },
       'open-palette': { suggested_key: { default: 'Alt+T' }, description: 'Search tabs, pins and archived tabs' },
+      'cycle-recent-tabs': {
+        description: 'Cycle through recent tabs forward',
+      },
+      'cycle-recent-tabs-previous': { description: 'Cycle through recent tabs backward' },
       'next-space': { description: 'Switch to the next Volet' },
       'previous-space': { description: 'Switch to the previous Volet' },
       'toggle-pin': { suggested_key: { default: 'Alt+P' }, description: 'Pin or unpin the current tab' },

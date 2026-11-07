@@ -21,6 +21,11 @@ list in step with the manifest, and `PRIVACY.md` in step with what Volet reads a
 
 ## Svelte MCP
 
+Before Svelte work, read the official project-local skills in `.agents/skills/`:
+
+- `svelte-code-writer/SKILL.md`: documentation lookup and autofixer workflow.
+- `svelte-core-bestpractices/SKILL.md`: modern Svelte reactivity and component guidance, with references.
+
 The Svelte MCP server is configured for this project in `.mcp.json` (remote, `https://mcp.svelte.dev/mcp`).
 In Claude Code it is equivalent to `claude mcp add -t http -s project svelte https://mcp.svelte.dev/mcp`.
 Approve it when Claude Code asks on first launch in this repo.
@@ -163,6 +168,8 @@ Three layers, each with a single job. Dependencies point downward only.
 ## Coding guidelines
 
 Prioritize **modularity, reusability, and separation of concerns**.
+
+- **Opposite actions get separate bindings.** Expose both directions (such as next/previous) as independently configurable shortcuts in Settings. An unassigned action has no implicit modifier binding.
 
 - **One responsibility per component, kept small and focused.** When a component or module grows, extract helpers, sub-components, or state modules instead of expanding it. Never add "just one more thing" to a file when it deserves its own abstraction.
 - **Generic and data-driven.** Components take clear inputs (props) and outputs (callback props or snippets). No hardcoded business rules or tight coupling: presentational components (`TabRow`, `IconButton`, `Favicon`, ...) know nothing about the store; thin container components connect them to `SidebarStore`.

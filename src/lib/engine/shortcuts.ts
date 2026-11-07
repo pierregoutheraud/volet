@@ -1,5 +1,6 @@
 import { browser, type Browser } from 'wxt/browser';
 import type { Engine } from './engine';
+import { cycleRecentTabs } from './recent-tabs/shortcuts';
 import { toggleSidePanel } from './side-panel';
 import { pendingPaletteItem } from './storage';
 
@@ -19,6 +20,11 @@ export function listenForShortcuts(engine: Engine): void {
         break;
       case 'open-palette':
         openPalette(tab);
+        break;
+      case 'cycle-recent-tabs':
+      case 'cycle-recent-tabs-previous':
+        void cycleRecentTabs(engine, tab, command === 'cycle-recent-tabs' ? 1 : -1)
+          .catch((error) => console.warn('Recent tab shortcut failed', error));
         break;
       case 'next-space':
       case 'previous-space':
