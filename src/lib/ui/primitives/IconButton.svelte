@@ -25,8 +25,10 @@
       type="button"
       {...mergeProps(props, rest, {
         class: [
+          // The hover fades in and out (and so does `reveal`).
+          'grid size-6 place-items-center rounded-[7px] text-ink-muted transition-[opacity,background-color,color] duration-150',
           // Icons don't take the pointer: the button does, so a shared tooltip sees it go button to button.
-          'grid size-6 place-items-center rounded-[7px] text-ink-muted transition-opacity duration-100 hover:bg-hover hover:text-ink *:pointer-events-none',
+          'hover:bg-hover hover:text-ink *:pointer-events-none',
           reveal && 'opacity-0 group-focus-within/row:opacity-100 group-hover/row:opacity-100 group-data-hovered/row:opacity-100',
         ],
         'aria-label': label,
