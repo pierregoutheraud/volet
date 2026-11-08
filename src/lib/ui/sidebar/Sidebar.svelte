@@ -67,8 +67,12 @@
   });
 </script>
 
+<!-- The panel's wash. Its hue glides from one Space's color to the next (registered in app.css), except while a swipe
+     or a color pick drives it directly. -->
 <div
-  class="sidebar @container relative flex h-full flex-col overflow-hidden select-none"
+  class={['sidebar @container relative flex h-full flex-col overflow-hidden select-none',
+    'bg-[linear-gradient(170deg,var(--wash-top),var(--wash-bottom))] [transition:--space-hue_460ms_cubic-bezier(0.2,0.8,0.2,1)]',
+    'data-[swiping=true]:transition-none data-tint-live:transition-none motion-reduce:transition-none']}
   data-scheme={colorScheme(scheme)}
   data-swiping={swipe.dragging}
   data-tint-live={huePreview.active || undefined}

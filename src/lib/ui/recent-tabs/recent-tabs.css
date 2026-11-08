@@ -1,0 +1,28 @@
+/* Styles for the recent tab switcher shown over web pages, inside its own shadow root: Volet's tokens, like Search. */
+@import 'tailwindcss' source(none);
+@import '../../../styles/tokens.css';
+@import '../../../styles/theme.css';
+@import '../../../styles/page-scales.css';
+
+/* Classes used by the switcher's components and the shared favicon. */
+@source './';
+@source '../primitives/Favicon.svelte';
+
+/*
+ * Utilities do the rest. Inside a shadow root, avoid the ones built on @property (shadow-*, ring-*, transforms,
+ * border widths), which Chrome doesn't register there: write those as properties ([box-shadow:var(--pill-shadow)]).
+ */
+
+/*
+ * The page's own rules for the host win over a normal :host rule, and pages built from web components hide elements
+ * that aren't defined yet (reddit's :not(:defined)), which content scripts can't define. An important :host rule wins.
+ */
+:host { all: initial !important; }
+
+/* In the base layer so utilities can adjust it (outline-offset-1). */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: -2px;
+  }
+}

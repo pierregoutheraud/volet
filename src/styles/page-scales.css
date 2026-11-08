@@ -1,0 +1,23 @@
+/*
+ * Tailwind's scales in px, for Volet's surfaces over web pages (Search, the tab switcher): rem there is the page's
+ * root font size, not ours (a shadow root doesn't change that). YouTube sets it to 10px, which shrank every height,
+ * padding and corner by a third.
+ */
+@theme {
+  --spacing: 4px;
+  --radius: 4px;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-3xl: 24px;
+  --radius-4xl: 32px;
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+}

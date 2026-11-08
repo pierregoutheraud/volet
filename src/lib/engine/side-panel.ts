@@ -18,6 +18,19 @@ export function toggleSidePanel(windowId: number): void {
     .catch((error) => console.warn('toggle side panel', error));
 }
 
+/** Asked when the palette shortcut is pressed: a page shown next to a focused panel gets no keys (`answerPanelFocus`). */
+export const PANEL_FOCUSED = 'palette:panel-focused';
+
+/** Whether the window's panel has the keyboard: only a focused panel answers, so no answer (or no panel) means no. */
+export async function panelHasFocus(windowId: number): Promise<boolean> {
+  try {
+    const answer: unknown = await browser.runtime.sendMessage({ type: PANEL_FOCUSED, windowId });
+    return typeof answer === 'object' && answer !== null && 'focused' in answer && answer.focused === true;
+  } catch {
+    return false;
+  }
+}
+
 async function isPanelOpen(windowId: number): Promise<boolean> {
   return Boolean((await openPanelsItem.getValue())[windowId]);
 }

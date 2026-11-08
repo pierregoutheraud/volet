@@ -14,6 +14,10 @@ To do its job, Volet reads, on your device only:
   last used. This is what the sidebar shows, and how Volet knows which unused tabs to archive.
 - **Your bookmarks**: Volet keeps your Volets, pinned tabs, folders and favorites as bookmarks in a folder named
   "Volet", and reads that folder to show them.
+- **Page previews, unless you remove both of the recent tab switcher's shortcuts**: Volet captures the visible page
+  after you visit a tab, as a small image. Previews are used only in the centered tab switcher, which websites can't
+  read. To notice the switcher shortcut's modifier being let go, Volet also listens for keys on websites, including in
+  their frames; it only notes whether that modifier is held, and the switcher's own keys while it is open.
 - **An Arc sidebar file, only if you pick one** on the "Import from Arc" page. Volet reads it in the browser to
   import your Arc Spaces, and the file never leaves your computer.
 
@@ -24,8 +28,12 @@ a search typed in the address bar.
 
 - **Bookmarks** (the "Volet" folder): your Volets, pins, folders and favorites.
 - **Extension storage on your device**: archived tabs (title, address, Volet name, date), which folders are open,
-  the titles Volet gave to pins, and the content of an imported Arc sidebar.
+  the titles Volet gave to pins, the preview-only close shortcut, and the content of an imported Arc sidebar.
 - **Temporary storage**: which tab belongs to which pin and Volet, cleared when Chrome quits.
+- **Temporary tab switcher data**: the five most recently visited or opened tab ids per window, plus up to ten page
+  screenshots, in Chrome's session storage, which Chrome keeps in memory. Screenshots are never synced or written to
+  disk by Volet, and are cleared when Chrome quits, when Volet is updated or reloaded, or when both switcher shortcuts
+  are removed. Incognito pages are not captured.
 - **Synced extension storage**: your Volets' colors and Volet's settings.
 
 If you turned on Chrome Sync, Chrome copies your bookmarks and Volet's synced storage to your other computers through

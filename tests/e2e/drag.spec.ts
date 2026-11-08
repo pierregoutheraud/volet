@@ -385,8 +385,12 @@ test('holding a tab over a Space dot switches to it, so the tab can be placed th
 test('dragging a Space dot reorders the Spaces', async ({ worker, panel }) => {
   await panel.getByRole('button', { name: 'New Volet' }).click();
   await expect(visiblePage(panel).getByRole('heading')).toHaveText('Volet 2');
-  const dots = panel.getByRole('navigation', { name: 'Volets' }).locator('li button');
+  const shutters = panel.getByRole('navigation', { name: 'Volets' });
+  const dots = shutters.locator('li button');
   await expect(dots).toHaveCount(2);
+  // The new Volet's shutter opens as the first one closes, and the centered row shifts while their widths animate:
+  // measure them once they've settled.
+  await expect.poll(() => shutters.evaluate((nav) => nav.getAnimations({ subtree: true }).length)).toBe(0);
 
   // Drag the second dot onto the left half of the first.
   const from = (await dots.nth(1).boundingBox())!;

@@ -26,11 +26,19 @@ A rewrite inspired by [Arcify](https://github.com/nisargkolhe/arcify) (GPL-3.0),
 - **Right-click menus** on every tab, pin, folder, favorite and Space: rename (or double-click a pin or folder, click a
   Space's name), move to another Space, put a tab in a new folder, add a new folder at the top of the Space (from a
   pin, folder or the Space) or inside a folder, Space colors, reorder and delete Spaces, and more.
-- **Search palette.** Press <kbd>Alt</kbd>+<kbd>T</kbd> on any page for an Arc-style palette over it: open tabs (all windows),
+- **Search palette.** Press <kbd>Ctrl</kbd>+<kbd>M</kbd> on any page for an Arc-style palette over it: open tabs (all windows),
   pins, favorites, archived tabs, Spaces, actions, a web address, or a web search. In the sidebar: the search button,
-  <kbd>⌘K</kbd>/<kbd>Ctrl+K</kbd>, or <kbd>/</kbd>.
+  <kbd>⌘K</kbd>/<kbd>Ctrl+K</kbd>, or <kbd>/</kbd>, and <kbd>Ctrl</kbd>+<kbd>M</kbd> too while the sidebar has focus.
 - **Import from Arc.** Settings → Import from Arc reads Arc's `StorableSidebar.json` and brings over your Spaces, their
   colors, pinned tabs, folders and favorites. The file never leaves your computer.
+- **Recent tab switcher.** Hold <kbd>Ctrl</kbd> and press <kbd>Q</kbd> to cycle through your five most recent tabs
+  across Spaces in this window, like Cmd+Tab: a quick tap goes back to the tab you last used, and each further press
+  goes one tab further back; let go to switch. Add <kbd>Shift</kbd> to cycle in reverse, like Cmd+Shift+Tab: it starts
+  from the far right (the oldest of the five) and moves left. Newly opened background tabs take priority, so opening a
+  link with Cmd/Ctrl+click makes it the next selection. A centered preview highlights the selection, the arrow keys
+  move it and Escape cancels. Record a close shortcut in Settings → Keyboard shortcuts to close the highlighted tab
+  without switching to it, or hover a preview and use its close button (Chrome reserves Cmd+W). Remove both shortcuts
+  to turn the switcher off. Screenshots appear after you visit tabs and stay in memory on your device.
 
 Spaces, pins, folders and favorites live in your bookmarks (an "Other bookmarks → Volet" folder), so they sync across
 your computers with Chrome sync and survive reinstalling. Space colors and settings sync through Chrome too. Nothing is
@@ -40,12 +48,18 @@ sent anywhere else: see the [privacy policy](PRIVACY.md).
 
 | Action | Default |
 | --- | --- |
-| Show or hide the sidebar | <kbd>Alt</kbd>+<kbd>S</kbd> |
-| Search tabs, pins and archived tabs | <kbd>Alt</kbd>+<kbd>T</kbd> |
+| Show or hide the sidebar | <kbd>Ctrl</kbd>+<kbd>B</kbd> |
+| Search tabs, pins and archived tabs | <kbd>Ctrl</kbd>+<kbd>M</kbd> |
+| Cycle through recent tabs | <kbd>Ctrl</kbd>+<kbd>Q</kbd> |
+| Cycle through recent tabs in reverse | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Q</kbd> |
+| Close highlighted preview tab | not set, record in Volet settings |
 | Next / previous Space | not set |
-| Pin or unpin the current tab | <kbd>Alt</kbd>+<kbd>P</kbd> |
+| Pin or unpin the current tab | not set |
 
-Change them in `chrome://extensions/shortcuts` (Settings has a link).
+Ctrl is the Control key on a Mac too, not Cmd. Change native shortcuts in `chrome://extensions/shortcuts` (Settings
+has a link). Chrome lets an extension suggest at most four, so the others start unassigned. Record and clear the preview-only close
+shortcut in Volet settings, including the modifier you hold while cycling. This device-local shortcut works only while
+the preview is open.
 
 ### Limits of a Chrome extension
 
@@ -53,6 +67,9 @@ Change them in `chrome://extensions/shortcuts` (Settings has a link).
   vertical tabs can replace it if you prefer.
 - The side panel's width and side are set by Chrome.
 - The palette can't appear on Chrome's own pages (`chrome://`, the Web Store); there it opens in the sidebar instead.
+- The recent tab switcher cannot overlay Chrome pages or the Web Store: its shortcut switches directly to the previous
+  tab there. Holding the modifier to choose needs focus in a website (any of its frames) or the Volet panel: with focus
+  in the address bar or elsewhere in Chrome's own interface, a press switches straight to the previous tab.
 - Arc's Split View, Peek and Little Arc aren't possible.
 
 ## Install
@@ -73,6 +90,7 @@ pnpm proto      # sidebar UI as a plain web page on fake data (fast visual itera
 pnpm dev        # dev mode: opens a fresh Chrome profile with the extension, live reload
 pnpm dev:own    # same dev server, no browser: load output/chrome-mv3-dev in your own profile
 pnpm check      # svelte-check + TypeScript
+pnpm check:extension  # builds, checks runtime diagnostics and reloads in isolated Chromium
 pnpm test       # unit tests (Vitest)
 pnpm test:e2e   # builds, then drives real Chromium with the extension loaded (Playwright)
 pnpm zip        # production build zipped for the Chrome Web Store (output/volet-<version>-chrome.zip)
@@ -92,6 +110,22 @@ Releasing to the Chrome Web Store: the listing copy, permission justifications a
 Don't enable the dev build and a production build in the same profile at the same time: both would manage your tabs.
 
 Architecture, coding guidelines and the Svelte MCP setup are in [AGENTS.md](AGENTS.md).
+
+### Checking extension errors
+
+Run `pnpm check:extension` before sharing an extension build. It builds the end-to-end variant (the production build
+with open shadow roots, in `output/chrome-mv3-e2e`), opens it in a disposable Chromium profile, exercises the
+settings, import, sidebar and tab preview, and reloads the extension twice with website tabs left open. It checks
+console warnings/errors, uncaught page errors, and Chrome's own extension runtime and manifest error records. Findings
+fail the command and are saved to `test-results/extension-check/report.json`. The check uses local test pages and a
+temporary copy of the build: your profile and build stay unchanged. It checks the exercised flows, rather than
+guaranteeing that every possible browser interaction is error-free.
+
+To inspect a different built extension without rebuilding, use `node scripts/check-extension.mjs --extension /path/to/build`.
+
+Shadow roots Volet adds to web pages (Search, the tab switcher) are closed, so pages can't read your tabs in them. The
+end-to-end tests and `pnpm check:extension` build with `--mode e2e`, which opens them for Playwright: never ship that
+build (`pnpm zip` builds its own).
 
 ## License
 

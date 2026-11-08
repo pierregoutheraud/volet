@@ -126,4 +126,8 @@ export interface SidebarStore {
   setSpaceHue(spaceId: SpaceId, hue: number): Done;
   moveSpace(spaceId: SpaceId, index: number): Done;
   deleteSpace(spaceId: SpaceId): Done;
+
+  // Volet's own pages
+  /** Open Volet's settings in a tab. */
+  openSettings(): Done;
 }

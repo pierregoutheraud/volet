@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tab switcher prototype</title>
+    <style>
+      /* A web page for the switcher to show over. */
+      body {
+        margin: 0;
+        background: #fff;
+        color: #1f2328;
+        font: 16px/1.6 Georgia, serif;
+      }
+      main {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 56px 24px;
+      }
+      h1 {
+        font: 700 36px/1.2 system-ui, sans-serif;
+      }
+      figure {
+        height: 220px;
+        margin: 32px 0;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #f6d365, #fda085);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>A page behind the tab switcher</h1>
+      <p>
+        The switcher opens on the previous tab, as the first press does. Use the arrow keys, hover or click a card,
+        press Escape to close it, and Space to open it again. Add <code>?theme=dark</code> or <code>?theme=light</code>
+        to force a color scheme, and <code>?hue=150</code> for another Volet color.
+      </p>
+      <figure></figure>
+      <p>
+        Volet keeps a screenshot of the pages you visit, so the switcher can show them. Tabs it hasn't captured yet
+        show their favicon instead.
+      </p>
+    </main>
+    <script type="module" src="./recent-tabs.ts"></script>
+  </body>
+</html>

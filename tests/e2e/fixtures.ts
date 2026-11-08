@@ -1,7 +1,8 @@
 import path from 'node:path';
 import { type BrowserContext, type Page, type Worker, test as base, chromium, expect } from '@playwright/test';
 
-export const extensionPath = path.resolve(import.meta.dirname, '../../output/chrome-mv3');
+// The end-to-end build (`wxt build --mode e2e`): the production build, but with open shadow roots Playwright can reach.
+export const extensionPath = path.resolve(import.meta.dirname, '../../output/chrome-mv3-e2e');
 
 interface Fixtures {
   context: BrowserContext;

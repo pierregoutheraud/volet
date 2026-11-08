@@ -43,7 +43,11 @@ DRAG AND DROP
 • Select several rows with Shift-click or Cmd/Ctrl-click and drag them together.
 
 SEARCH PALETTE
-• Press Alt+T (Option+T on a Mac) on any page to search your open tabs in every window, your pins, favorites, archived tabs and Volets, open a web address, or search the web.
+• Press Ctrl+M (Control+M on a Mac too) on any page to search your open tabs in every window, your pins, favorites, archived tabs and Volets, open a web address, or search the web.
+
+RECENT TAB SWITCHER
+• Hold Ctrl (Control on a Mac too) and press Q to see your five most recent tabs in this window, with a preview of each, across Volets. Let go to switch: a quick tap goes back to the tab you last used, like Cmd+Tab.
+• Add Shift to go the other way. The arrow keys move the selection, Escape cancels, and you can close a tab right from the switcher.
 
 RIGHT-CLICK MENUS
 • Rename, move to another Volet, put in a new folder, change a Volet's color, and more, on every tab, pin, folder, favorite and Volet.
@@ -56,10 +60,11 @@ YOUR DATA STAYS YOURS
 • Volet has no server, no account and no analytics. Nothing you do is sent anywhere.
 
 KEYBOARD SHORTCUTS
-• Alt+S: show or hide the sidebar
-• Alt+T: search
-• Alt+P: pin or unpin the current tab
-• Next and previous Volet: set your own in chrome://extensions/shortcuts
+• Ctrl+B: show or hide the sidebar
+• Ctrl+M: search
+• Ctrl+Q: cycle through your recent tabs, hold Ctrl to pick one (Ctrl+Shift+Q in reverse)
+• On a Mac, these use the Control key too
+• Next and previous Volet, pin or unpin the current tab: set your own in chrome://extensions/shortcuts
 
 GOOD TO KNOW
 • Chrome's own tab strip stays at the top; Volet keeps it tidy by collapsing the other Volets' groups.
@@ -141,22 +146,29 @@ The search palette's "Search for..." result runs the query with the user's defau
 `activeTab`
 
 ```
-When the user presses the search shortcut, the search palette opens over the page they are on. activeTab limits that to the current tab, only after the user's shortcut.
+When the user presses the search shortcut, the search palette opens over the page they are on. activeTab keeps that working on the current tab, only after the user's shortcut, when the user has withheld Volet's website access in Chrome.
 ```
 
 `scripting`
 
 ```
-Injects the search palette into the current page when the user presses its shortcut (together with activeTab, so only that page and only then). The palette is part of the extension package; no remote code.
+Injects the search palette into the current page when the user presses its shortcut. Registers the recent tab switcher's small listener on websites (in their frames too, where the keyboard focus may be) for its shortcut's modifier being released, and adds the switcher's overlay to a page the first time the user presses its shortcut there. All scripts are part of the extension package; no remote code.
 ```
 
-**Host permissions**: none. (The manifest makes `_favicon/*` web accessible so the in-page search palette can show
-site icons from Chrome's favicon cache; it grants no access to pages.)
+**Host permissions**: `<all_urls>`, for the recent tab switcher (on by default; removing both of its shortcuts turns it off). Chrome shows
+it at install ("Read and change all your data on all websites") and puts the item through a closer review.
+
+```
+The recent tab switcher (on by default; removing both of its shortcuts turns it off) needs website access for three things. Chrome's keyboard commands only report the shortcut being pressed, so a packaged content script listens on websites for its modifier being released, which picks the tab. The same script draws the centered switcher over the page. And Volet captures a preview of the visible page as tabs are visited. Previews are small images kept in memory on the device (ten at most), are never synced or uploaded, are shown in a closed shadow root that websites can't read, and incognito pages are not captured.
+```
+
+(The manifest also makes `_favicon/*` web accessible so the in-page search palette can show site icons from Chrome's
+favicon cache.)
 
 **Are you using remote code?** No, I am not using remote code.
 
-**Data usage**, what user data is collected: check **Web history** only. (Volet reads tab titles, addresses and
-last-use times and keeps archived tabs, all on the device. Chrome's policy counts local handling, so it's
+**Data usage**, what user data is collected: check **Web history** and **Website content**. (Volet reads tab titles,
+addresses and last-use times, keeps archived tabs, and captures page previews for the tab switcher, all on the device. Chrome's policy counts local handling, so it's
 disclosed even though nothing is transmitted.)
 
 Certify all three:

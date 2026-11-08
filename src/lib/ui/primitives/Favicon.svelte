@@ -8,15 +8,17 @@
     /** The icon Chrome shows on the open tab, when there is one: preferred over the cache. */
     icon?: string;
     size?: number;
+    /** Fully resolved image sources for a host that cannot request the favicon cache directly. Empty means fallback only. */
+    sources?: string[];
   }
 
-  let { url, icon, size = 16 }: Props = $props();
+  let { url, icon, size = 16, sources }: Props = $props();
 
   /** Browser pages (new tab, settings) have no site favicon. */
   const internal = $derived(/^(chrome|about|edge|brave):/.test(url));
   /** Sources that failed to load; the next one is tried. */
   let failed = $state.raw<string[]>([]);
-  const src = $derived(faviconSources(url, size, icon).find((candidate) => !failed.includes(candidate)));
+  const src = $derived((sources ?? faviconSources(url, size, icon)).find((candidate) => !failed.includes(candidate)));
 </script>
 
 {#if internal}

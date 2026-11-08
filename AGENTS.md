@@ -5,13 +5,14 @@ Volet: Arc-like vertical tab Spaces for Chrome, a side panel extension built wit
 ## Commands
 
 ```bash
-pnpm proto          # sidebar UI as a plain web page on fake data (fast visual iteration)
+pnpm proto          # sidebar UI as a plain web page on fake data (fast visual iteration); /recent-tabs.html: the tab switcher
 pnpm dev            # extension dev mode: launches a fresh Chrome profile, live reload
 pnpm dev:own        # same, without launching Chrome (load output/chrome-mv3-dev in your own profile)
 pnpm build          # production build in output/chrome-mv3
 pnpm check          # svelte-check + TypeScript
+pnpm check:extension # runtime diagnostics and extension reload smoke check (on the e2e build)
 pnpm test           # unit tests (Vitest)
-pnpm test:e2e       # builds, then drives real Chromium with the extension loaded (Playwright)
+pnpm test:e2e       # builds with --mode e2e (output/chrome-mv3-e2e), then drives real Chromium with it (Playwright)
 pnpm zip            # production build zipped for the Chrome Web Store
 pnpm store:images   # store screenshots and promo tiles (proto/store.html, rendered by store/capture.mjs)
 ```
@@ -20,6 +21,11 @@ Store listing copy, permission justifications and the release checklist: `store/
 list in step with the manifest, and `PRIVACY.md` in step with what Volet reads and stores.
 
 ## Svelte MCP
+
+Before Svelte work, read the official project-local skills in `.agents/skills/`:
+
+- `svelte-code-writer/SKILL.md`: documentation lookup and autofixer workflow.
+- `svelte-core-bestpractices/SKILL.md`: modern Svelte reactivity and component guidance, with references.
 
 The Svelte MCP server is configured for this project in `.mcp.json` (remote, `https://mcp.svelte.dev/mcp`).
 In Claude Code it is equivalent to `claude mcp add -t http -s project svelte https://mcp.svelte.dev/mcp`.
@@ -78,8 +84,9 @@ Three layers, each with a single job. Dependencies point downward only.
   "Coming from Arc?" card (`ArcInvite`, `arcInviteItem`) opens the import until it's dismissed or used.
 - **Pure logic is kept pure** (`derive.ts`, `snapshot.ts`, `colors.ts`, importers, search ranking) so it can be unit tested without Chrome.
 - **Entry points** (`src/entrypoints/`): `background.ts` (the engine), `sidepanel/` (the sidebar), `palette.ts`
-  (unlisted script injected into the current page by the palette shortcut, rendered in a shadow root),
-  `options/` (settings) and `import/` (Arc import).
+  (unlisted script injected into the current page by the palette shortcut, rendered in a shadow root; with the panel
+  focused, the shortcut opens the panel's own palette instead, as the page would get none of its keys:
+  `panelHasFocus`, answered by `state/chrome/panel-focus.ts`), `options/` (settings) and `import/` (Arc import).
 - **Drag and drop** (`ui/sidebar/drag/`): nothing moves while dragging. `DragState.drop` is where the rows would
   land, shown as a line in the gap next to a row (`DropLine`, drawn by `SortableEntry`), a lit-up folder row (its
   middle drops into it) or a lit-up empty list (`DropZone`; the unpinned tabs have no empty hint to light up, so
@@ -113,8 +120,8 @@ Three layers, each with a single job. Dependencies point downward only.
   user's groups. Each one is a shutter (`SpaceDot`, a volet; the code still calls them dots): closed, a small panel in
   its color with its initial (`spaceInitial`); the active one opens into a pill with its name, its width animating
   (`interpolate-size`). While a row is dragged, the shutter open at its start stays open (`DragState.startSpaceId`):
-  hovering another one switches Space, and opening it then would move the shutters under the pointer. Closed shutters narrow from 26px slots to 20px to fit next to the open one between the two
-  buttons (`SpaceSwitcher`), then the row scrolls (`primitives/scroll-strip.ts`): no scrollbar, a fade on each edge
+  hovering another one switches Space, and opening it then would move the shutters under the pointer. Closed shutters narrow from 26px slots to 20px to fit next to the open one,
+  centered between the tools (Search, then Settings, in the corner) and New Volet (`SpaceSwitcher`), then the row scrolls (`primitives/scroll-strip.ts`): no scrollbar, a fade on each edge
   that hides shutters, the wheel scrolls it, and the open shutter is kept in view (again once it has opened). Wheel
   events the row uses stop there, so they don't also swipe Spaces.
 - **Menus are data** (`model/menu.ts`), built by plain functions in `ui/sidebar/menus/` and rendered by the generic
@@ -122,7 +129,9 @@ Three layers, each with a single job. Dependencies point downward only.
   `group` item puts items under a small heading in the menu itself. A `swatches` item with `onPreview` adds a slider
   for any hue (`HueSlider`, a Volet's color): the panel and the Volet's shutter follow it through `HuePreview`
   (`ui/sidebar/hue-preview.svelte.ts`, purely visual), and it's saved with one command once it settles (let go, a
-  pause after a key, or left). Overlays portal into `[data-overlay-root]` inside `.sidebar` to keep the tint.
+  pause after a key, or left). Overlays portal into `[data-overlay-root]` inside `.sidebar` to keep the tint (the
+  pages' `PageShell` has one too). The pages' choices use `primitives/page/Select.svelte` (Bits UI's Select), listed on
+  the menus' surface and rows (`styles/menu-surface.css`, `MENU_ITEM_CLASS`), never a native `<select>`.
   Every menu is placed by `primitives/menu/placement.ts` (`MENU_PLACEMENT`): menus open below the pointer so they can
   slide sideways and flip up to stay inside the panel, and scroll when taller than it. Submenus expand in place under
   their item (`SubMenu.svelte`) instead of flying out: there's no room beside a menu in a side panel, and one laid
@@ -156,16 +165,53 @@ Three layers, each with a single job. Dependencies point downward only.
   until they have landed. Page order and placement rules are pure
   (`model/selection.ts`). `SelectionDismiss` clears it on a click outside the selected rows, on panel blur, and on
   an Escape nothing else handled. Mark new menus or dialogs' containers so they stay inside `[data-overlay-root]`.
-- **Styles**: `styles/tokens.css` (design tokens on `.sidebar`, `.palette-root`, `.page-root`), `styles/theme.css`
-  (Tailwind theme), then one entry stylesheet per surface (`app.css`, `ui/palette/palette.css`, `styles/page.css`).
-  Inside the palette's shadow root, avoid Tailwind utilities that rely on `@property` (transforms, shadows, rings).
-  `rem` there is the page's root font size, not ours (YouTube's is 10px), so `palette.css` sets Tailwind's spacing,
-  radius and text scales in px: size anything else in px too (an e2e test renders it over a 10px root).
+- **Recent tab switcher** (`engine/recent-tabs/`, `ui/recent-tabs/`): on while either of its shortcuts is assigned and
+  Chrome grants site access (`<all_urls>`, required, but users can withhold it): `recentTabsEnabled` gates the
+  previews and the shortcut. The page script follows site access only: Chrome reports no change to shortcuts, and
+  without one the script stays idle. Chrome's commands only report the shortcut, never letting go of the modifier, so
+  a script on every website, in every frame (`entrypoints/recent-tabs.ts`, registered at `document_start`), watches
+  it; the worker forwards each press to the active page's top frame (`recent-tabs:step`). That script stays small (no
+  Svelte): the overlay is its own script (`entrypoints/recent-tabs-overlay.ts`), which the worker adds to a page on its
+  first press (`recent-tabs:overlay`), reading the switcher the page script left on its window
+  (`ui/recent-tabs/host.ts`, Volet's isolated world) through a plain `RecentTabsFeed`. A page that didn't see the
+  modifier go down asks whoever has focus instead (`relayHoldsModifier`): its window's Volet panel
+  (`recent-tabs:panel-holds`) and its own frames, through the worker (`recent-tabs:frames-hold`); the one holding it
+  sends the page its keys (`ui/recent-tabs/relay-keys.ts`, `recent-tabs:relay-key`, the only message a frame may
+  send). All read keys through `model/recent-tab-keys.ts`, so they mean the same everywhere. The worker reads Chrome's
+  shortcuts once per press before forwarding it, so letting go right after a press can reach the page first: the
+  worker follows each press until the page has it (`engine/recent-tabs/presses.ts`), the page waits for those before
+  switching (`recent-tabs:settle`), and one arriving meanwhile still counts (`RecentTabCycle.amend`). Only switching
+  and closing tabs wait for the engine queue: history has its own (`history.ts`), and the tabs and hue a page asks for
+  are read outside it, like Search's. Open pages get the script once per session (`attachToOpenPagesOnce`), not each
+  time the worker wakes, and out of the engine queue too: a page still loading would hold every command. Screenshots
+  are shrunk to 400 pixels across (`engine/image.ts`) and live in `chrome.storage.session` (`preview-store.ts`, one
+  key each plus a small index), so they outlive the worker, which Chrome stops after about 30 seconds idle; that
+  storage also holds the engine's session state, so keep them small.
+- **Styles**: `styles/tokens.css` (design tokens on `.sidebar`, `.palette-root`, `.page-root`, `.recent-tabs-root`),
+  `styles/theme.css` (Tailwind theme), then one entry stylesheet per surface (`app.css`, `ui/palette/palette.css`,
+  `ui/recent-tabs/recent-tabs.css`, `styles/page.css`). Surfaces over web pages (palette, tab switcher) take the
+  active Volet's hue from the worker's answers and the system's color scheme, like the panel.
+  They use Tailwind too, with two limits inside their shadow roots. `rem` there is the page's root font size, not ours
+  (YouTube's is 10px), so `styles/page-scales.css` sets Tailwind's spacing, radius and text scales in px: size
+  anything else in px too (e2e tests render both over a 10px root). And Chrome doesn't register `@property` there, so
+  utilities built on it (`shadow-*`, `ring-*`, transforms, border widths) do nothing: write those as arbitrary
+  properties (`[box-shadow:var(--overlay-shadow)]`).
+  Shadow roots Volet adds to web pages (palette, recent tab switcher) are closed (`shadowMode`), so the page's own
+  scripts can't read the tabs shown in them; only the e2e build (`--mode e2e`) opens them, for Playwright. They start
+  with `:host { all: initial !important; }`: the page's own rules for the host win over a normal `:host` rule, and
+  sites built from web components hide undefined elements (`:not(:defined)`, reddit), which a content script's host
+  always is.
 
 ## Coding guidelines
 
 Prioritize **modularity, reusability, and separation of concerns**.
 
+- **Opposite actions get separate bindings.** Expose both directions (such as next/previous) as independently
+  configurable shortcuts in Settings. An unassigned action has no implicit modifier binding. Chrome refuses to load an
+  extension that suggests more than four shortcuts (`suggested_key`), so the rest start unassigned. Suggest Control
+  everywhere (`MacCtrl` for a Mac: a manifest's `Ctrl` is Command there), and never one of Chrome's own shortcuts
+  (Ctrl+F, Ctrl+S, Cmd+Q...), which Chrome silently leaves unassigned. Chrome's shortcuts page lists commands by id,
+  so name opposite ones to sort the way Settings lists them (`cycle-recent-tabs`, then `cycle-recent-tabs-reverse`).
 - **One responsibility per component, kept small and focused.** When a component or module grows, extract helpers, sub-components, or state modules instead of expanding it. Never add "just one more thing" to a file when it deserves its own abstraction.
 - **Generic and data-driven.** Components take clear inputs (props) and outputs (callback props or snippets). No hardcoded business rules or tight coupling: presentational components (`TabRow`, `IconButton`, `Favicon`, ...) know nothing about the store; thin container components connect them to `SidebarStore`.
 - **UI, state, and business logic stay separate.** UI components never call `browser.*`. State modules never render. Engine code never imports Svelte.
@@ -176,7 +222,13 @@ Svelte specifics:
 
 - Svelte 5 runes only (`$state`, `$derived`, `$props`, `$effect` as a last resort), snippets instead of slots, callback props instead of events.
 - Prefer `$derived` over `$effect` for computed values.
-- Tailwind utilities for styling; design tokens are CSS variables on `.sidebar` in `src/app.css` (all tinted by `--space-hue`). Avoid component `<style>` blocks unless Tailwind can't express it.
+- Tailwind utilities for all styling, on every surface (the panel, Volet's pages, Search and the tab switcher over web
+  pages); design tokens are CSS variables (`styles/tokens.css`, all tinted by `--space-hue`). Keep stylesheets to what
+  utilities can't express, in Tailwind's own terms where it has them: `@theme`, base styles, `:host`, `@property` and
+  `@keyframes`, custom utilities (`@utility scroll-strip`), and surfaces shared by several components that utilities
+  adjust where they're used (`@layer components`: `.menu-surface` in `styles/menu-surface.css`, `.tooltip-surface`).
+  No component `<style>` blocks. Hooks for tests and code are data attributes (`data-row`, `data-recent-tab`), not
+  class names.
 - Accessibility floor: real buttons, labels on icon-only buttons, visible focus, respect `prefers-reduced-motion`.
 
 Engine specifics:
@@ -193,11 +245,14 @@ Engine specifics:
 ## Tests
 
 - Unit tests (`*.test.ts`, Vitest) next to pure modules.
-- End-to-end tests (`tests/e2e/*.spec.ts`, Playwright) load `output/chrome-mv3` into Chromium, open the panel page in its own window (`sidepanel.html?windowId=<id>`), and assert on Chrome's real state from the service worker.
+- End-to-end tests (`tests/e2e/*.spec.ts`, Playwright) load `output/chrome-mv3-e2e` (the production build with open
+  shadow roots, `NODE_ENV=production wxt build --mode e2e`: any other mode would otherwise compile Svelte for
+  development) into Chromium, open the panel page in its own window (`sidepanel.html?windowId=<id>`), and assert on Chrome's real state from the service worker.
 - New behavior in the engine gets an e2e test; new pure logic gets a unit test.
 - `tests/e2e/resilience.spec.ts` covers multiple windows and a real browser restart (same profile, session restored).
-- The palette's in-page overlay can't be triggered from Playwright (shortcuts are browser-level gestures); the panel
-  palette exercises the same components and worker messages.
+- Playwright can't press Volet's shortcuts (browser-level gestures), but the worker can run its own handling of one:
+  `chrome.commands.onCommand.dispatch(name, tab)` (`press` in `recent-tabs.spec.ts`). The palette's in-page overlay
+  is tested on its own; the panel palette exercises the same components and worker messages.
 
 ## Writing style
 

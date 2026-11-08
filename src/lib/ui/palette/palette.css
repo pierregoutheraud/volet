@@ -2,66 +2,18 @@
 @import 'tailwindcss';
 @import '../../../styles/tokens.css';
 @import '../../../styles/theme.css';
+@import '../../../styles/page-scales.css';
 
 /* Classes used by the palette components. */
 @source '../';
 
 /*
- * rem is the page's root font size, not ours (a shadow root doesn't change that): YouTube sets it to 10px,
- * which shrank every height, padding and corner here by a third. So Tailwind's scales are in px.
+ * The page's styles can't reach in (shadow root), and ours don't leak out. The page's own rules for the host still win
+ * over a normal :host rule (pages built from web components hide undefined elements, :not(:defined)): this one is
+ * important, so it wins.
  */
-@theme {
-  --spacing: 4px;
-  --radius: 4px;
-  --radius-xs: 2px;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
-  --radius-2xl: 16px;
-  --radius-3xl: 24px;
-  --radius-4xl: 32px;
-  --text-xs: 12px;
-  --text-sm: 14px;
-  --text-base: 16px;
-  --text-lg: 18px;
-  --text-xl: 20px;
-  --text-2xl: 24px;
-}
-
-/* The page's styles can't reach in (shadow root), and ours don't leak out. */
 :host {
-  all: initial;
-}
-
-.palette-root {
-  position: fixed;
-  inset: 0;
-  z-index: 2147483647;
-  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-  -webkit-font-smoothing: antialiased;
-}
-
-.palette-backdrop {
-  position: absolute;
-  inset: 0;
-  background: oklch(0.2 0.03 var(--space-hue) / 0.28);
-}
-
-/* Plain CSS here (not Tailwind transforms/shadows): @property doesn't register inside shadow roots. */
-.palette-box {
-  position: absolute;
-  top: 14vh;
-  left: 50%;
-  width: min(640px, calc(100vw - 32px));
-  margin-left: calc(min(640px, calc(100vw - 32px)) / -2);
-  border-radius: 14px;
-  overflow: hidden;
-  background: var(--menu);
-  color: var(--ink);
-  box-shadow:
-    0 24px 60px oklch(0.2 0.05 var(--space-hue) / 0.3),
-    0 0 0 0.5px var(--rule);
+  all: initial !important;
 }
 
 /* In the base layer so utilities like outline-none can override it. */

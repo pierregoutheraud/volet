@@ -1,0 +1,21 @@
+/*
+ * The surface every menu and list opens on: the panel's menus (right-click, New Volet) and the pages' selects.
+ * A component class, so utilities where it's used adjust it (`p-0`, `p-4`).
+ */
+@layer components {
+  .menu-surface {
+    z-index: 60;
+    min-width: 210px;
+    /* An expanded submenu can make it taller than the panel: then it scrolls. */
+    max-height: var(--bits-floating-available-height, none);
+    overflow-y: auto;
+    padding: 4px;
+    border-radius: 10px;
+    background: var(--menu);
+    color: var(--ink);
+    box-shadow:
+      0 10px 30px oklch(0.2 0.05 var(--space-hue) / 0.22),
+      0 0 0 0.5px var(--rule);
+    outline: none;
+  }
+}

@@ -1,9 +1,9 @@
 /*
- * Design tokens, shared by the side panel (.sidebar), the in-page palette (.palette-root)
- * and the extension's pages (.page-root).
+ * Design tokens, shared by the side panel (.sidebar), the in-page palette (.palette-root),
+ * the extension's pages (.page-root) and the in-page tab switcher (.recent-tabs-root).
  * They live on those roots (not :root) so they resolve against the root's --space-hue.
  */
-:where(.sidebar, .palette-root, .page-root) {
+:where(.sidebar, .palette-root, .page-root, .recent-tabs-root) {
   --wash-top: oklch(0.87 0.085 var(--space-hue));
   --wash-bottom: oklch(0.935 0.045 calc(var(--space-hue) + 35));
   --ink: oklch(0.27 0.035 var(--space-hue));
@@ -21,12 +21,15 @@
   --dot-ink: oklch(1 0 0);
   --dot-ring: var(--pill);
   --menu: oklch(0.985 0.012 var(--space-hue));
+  /* Search and the tab switcher, over a page. */
+  --overlay-shadow: 0 24px 60px oklch(0.2 0.05 var(--space-hue) / 0.3), 0 0 0 0.5px var(--rule);
   --danger: oklch(0.55 0.2 25);
+  --shortcut-custom: oklch(0.44 0.12 155);
 
   color: var(--ink);
 }
 
-:where(.sidebar, .palette-root, .page-root)[data-scheme='dark'] {
+:where(.sidebar, .palette-root, .page-root, .recent-tabs-root)[data-scheme='dark'] {
   --wash-top: oklch(0.31 0.07 var(--space-hue));
   --wash-bottom: oklch(0.21 0.035 calc(var(--space-hue) + 35));
   --ink: oklch(0.95 0.015 var(--space-hue));
@@ -44,5 +47,6 @@
   --dot-ring: oklch(0.95 0.015 var(--space-hue) / 0.7);
   --menu: oklch(0.27 0.035 var(--space-hue));
   --danger: oklch(0.72 0.17 25);
+  --shortcut-custom: oklch(0.82 0.13 155);
   color-scheme: dark;
 }

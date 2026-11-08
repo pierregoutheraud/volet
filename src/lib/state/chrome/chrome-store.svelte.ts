@@ -277,4 +277,12 @@ export class ChromeSidebarStore implements SidebarStore {
       if (this.activeSpaceId === spaceId) this.activeSpaceId = successor?.id ?? '';
     });
   }
+
+  // ───────────────────────────── pages ─────────────────────────────
+
+  /** Settings open in a tab: nothing the panel shows changes, so there's no refresh to wait for. */
+  async openSettings() {
+    await sendCommand({ type: 'openSettings' })
+      .catch((error: unknown) => console.error('Command openSettings failed:', error));
+  }
 }

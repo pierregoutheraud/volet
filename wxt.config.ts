@@ -22,8 +22,9 @@ export default defineConfig({
       "Vertical tabs in Chrome's side panel: switch between workspaces (Volets), each with its own pinned tabs, folders and colors.",
     // The source code (GPL-3.0), linked from the store listing and chrome://extensions.
     homepage_url: 'https://github.com/pierregoutheraud/volet',
-    // sidePanel.open and setPanelBehavior. Newer side panel events are feature-detected (engine/side-panel.ts).
-    minimum_chrome_version: '116',
+    // sidePanel.open and setPanelBehavior (116); the switcher's page script in frames with no address of their own
+    // (`matchOriginAsFallback`, 119). Newer side panel events are feature-detected (engine/side-panel.ts).
+    minimum_chrome_version: '119',
     // activeTab + scripting: the palette shortcut may show the palette on the current page only.
     permissions: [
       'sidePanel',
@@ -37,16 +38,28 @@ export default defineConfig({
       'activeTab',
       'scripting',
     ],
+    // The recent tab switcher (on while one of its shortcuts is assigned) listens on websites for the shortcut's modifier
+    // being let go, and captures local page previews as tabs are used.
+    host_permissions: ['<all_urls>'],
     // The in-page palette shows favicons from Chrome's cache, served from the extension's origin.
     web_accessible_resources: [{ resources: ['_favicon/*'], matches: ['<all_urls>'] }],
     // An action is required so clicking the toolbar icon can open the side panel.
     action: { default_title: 'Open Volet' },
+    // Chrome refuses to load an extension suggesting more than four shortcuts: the others start unassigned.
     commands: {
-      'toggle-sidebar': { suggested_key: { default: 'Alt+S' }, description: 'Show or hide the sidebar' },
-      'open-palette': { suggested_key: { default: 'Alt+T' }, description: 'Search tabs, pins and archived tabs' },
+      // Control on every platform. A manifest's Ctrl means Command on a Mac (Cmd+Q quits, Cmd+M minimizes), hence
+      // MacCtrl there. Chrome never assigns a suggested key that is one of its own shortcuts (Ctrl+F, Ctrl+S...).
+      'toggle-sidebar': { suggested_key: { default: 'Ctrl+B', mac: 'MacCtrl+B' }, description: 'Show or hide the sidebar' },
+      'open-palette': { suggested_key: { default: 'Ctrl+M', mac: 'MacCtrl+M' }, description: 'Search tabs, pins and archived tabs' },
+      // Like Cmd+Tab and Cmd+Shift+Tab. Chrome's shortcuts page lists commands by id, so cycling comes first, as in settings.
+      // Punctuation keys are named in manifests (Comma, not ,): Chrome refuses to load the extension otherwise.
+      'cycle-recent-tabs': { suggested_key: { default: 'Ctrl+Q', mac: 'MacCtrl+Q' }, description: 'Cycle through recent tabs' },
+      'cycle-recent-tabs-reverse': {
+        suggested_key: { default: 'Ctrl+Shift+Q', mac: 'MacCtrl+Shift+Q' }, description: 'Cycle through recent tabs in reverse',
+      },
       'next-space': { description: 'Switch to the next Volet' },
       'previous-space': { description: 'Switch to the previous Volet' },
-      'toggle-pin': { suggested_key: { default: 'Alt+P' }, description: 'Pin or unpin the current tab' },
+      'toggle-pin': { description: 'Pin or unpin the current tab' },
     },
   },
 });

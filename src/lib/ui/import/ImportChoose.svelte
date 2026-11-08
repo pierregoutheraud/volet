@@ -22,6 +22,11 @@
   }
 </script>
 
+<!-- A key to press, in the steps below. -->
+{#snippet key(label: string)}
+  <kbd class="mx-px inline-block min-w-[1.4em] rounded-sm bg-hover px-1 text-center [font:inherit]">{label}</kbd>
+{/snippet}
+
 {#if saved}
   <Card title="Your Arc Spaces">
     <p class="mb-4 text-[14px] leading-relaxed">
@@ -41,21 +46,9 @@
   <!-- A page can't open the file picker in a given folder, so the steps get there. -->
   <ol class="mb-4 list-decimal pl-5 text-[13px] leading-relaxed text-ink-muted">
     <li>Copy the path, then click the box below.</li>
-    <li>In the file picker, press <kbd>⌘</kbd><kbd>⇧</kbd><kbd>G</kbd>, paste the path, then press Return.</li>
+    <li>In the file picker, press {@render key('⌘')}{@render key('⇧')}{@render key('G')}, paste the path, then press Return.</li>
   </ol>
   <FileDrop label="Drop StorableSidebar.json here" accept=".json,application/json" {onfile} />
   <p class="mt-3 text-[12px] text-ink-muted">The file never leaves your computer.</p>
 </Card>
 
-<style>
-  kbd {
-    display: inline-block;
-    min-width: 1.4em;
-    margin: 0 1px;
-    padding: 0 4px;
-    border-radius: 4px;
-    background: var(--hover);
-    font: inherit;
-    text-align: center;
-  }
-</style>

@@ -3,7 +3,7 @@ import { prefersReducedMotion } from 'svelte/motion';
 
 /**
  * A row that scrolls sideways when its items don't fit: no scrollbar, a fade on each edge that
- * hides more items (`.scroll-strip` in `app.css`), and the mouse wheel scrolls it too. Wheel
+ * hides more items (the `scroll-strip` utility in `app.css`), and the mouse wheel scrolls it too. Wheel
  * events it uses stop there, so they don't also reach a swipe listening further up.
  */
 

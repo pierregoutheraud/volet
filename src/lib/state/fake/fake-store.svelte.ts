@@ -248,4 +248,10 @@ export class FakeSidebarStore implements SidebarStore {
     if (tabId === undefined) this.activeTabId = undefined;
     else this.activateTab(tabId);
   }
+
+  // ───────────────────────────── pages ─────────────────────────────
+
+  openSettings() {
+    console.info('[proto] The settings page would open here.');
+  }
 }

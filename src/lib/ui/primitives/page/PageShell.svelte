@@ -11,8 +11,12 @@
   let { title, intro, children }: Props = $props();
 </script>
 
-<!-- A full-page layout for the extension's own pages, in the sidebar's tint. -->
-<div class="page-root text-ink" data-scheme={colorScheme()}>
+<!-- A full-page layout for the extension's own pages, in the sidebar's tint (the default violet: pages aren't tied to a
+     Space). -->
+<div
+  class="page-root min-h-screen bg-[linear-gradient(170deg,var(--wash-top),var(--wash-bottom))] text-ink [--space-hue:268]"
+  data-scheme={colorScheme()}
+>
   <main class="mx-auto flex max-w-[640px] flex-col gap-5 px-4 py-12">
     <header>
       <h1 class="font-display text-[28px] leading-tight font-bold">{title}</h1>
@@ -20,4 +24,6 @@
     </header>
     {@render children()}
   </main>
+  <!-- Lists and menus render here, inside the page's tokens (see OVERLAY_ROOT). -->
+  <div data-overlay-root></div>
 </div>
