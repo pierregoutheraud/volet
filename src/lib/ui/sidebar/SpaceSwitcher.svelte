@@ -50,28 +50,13 @@
 </script>
 
 <nav class="flex h-11 flex-none items-center gap-2 px-2.5" aria-label="Volets">
-  <!-- Tools for all of Volet, Search in the corner. The shutters center in the room left between them and New Volet.
-       The buttons touch, so their tooltip glides from one to the other. -->
-  <TooltipGroup>
-    <div class="flex flex-none">
-      {#if palette}
-        <IconButton label="Search tabs and pins (⌘K)" onclick={() => palette.show()}>
-          <Search size={15} strokeWidth={2} />
-        </IconButton>
-      {/if}
-      <IconButton label="Settings" onclick={() => sidebar.openSettings()}>
-        <Settings size={15} strokeWidth={2} />
-      </IconButton>
-    </div>
-  </TooltipGroup>
-
   <!-- One tooltip for all the shutters: it glides to the hovered one. They touch (no gap)
        so the pointer goes straight from one to the next and the tooltip never closes between.
        Closed shutters take a slot, narrowing from 26px to 20px to fit next to the open one
        (up to 92px); past that, the row scrolls. -->
   <TooltipGroup>
     <ul
-      class="scroll-strip flex h-full min-w-0 flex-1 items-center justify-center-safe overflow-x-auto [container-type:inline-size] *:min-w-(--slot) *:flex-none"
+      class="scroll-strip flex h-full min-w-0 flex-1 items-center overflow-x-auto [container-type:inline-size] *:min-w-(--slot) *:flex-none"
       style:--dots={sidebar.spaces.length}
       style:--slot="clamp(20px, calc((100cqi - 92px) / max(var(--dots) - 1, 1)), 26px)"
       {@attach scrollStrip}
@@ -105,20 +90,32 @@
     </ul>
   </TooltipGroup>
 
-  <div class="w-6 flex-none">
-    <!-- While Arc Spaces are left to import, the button offers them next to a blank Volet. -->
-    {#if arc?.offers.length}
-      <DropdownMenu items={() => newVoletMenu(sidebar, arc)}>
-        {#snippet trigger(props)}
-          <IconButton {...props} label="New Volet">
-            <Plus size={16} strokeWidth={2} />
-          </IconButton>
-        {/snippet}
-      </DropdownMenu>
-    {:else}
-      <IconButton label="New Volet" onclick={() => sidebar.createSpace()}>
-        <Plus size={16} strokeWidth={2} />
+  <!-- New Volet next to the shutters, then the tools for all of Volet, Settings in the corner.
+       The buttons touch, so their tooltip glides from one to the other. -->
+  <TooltipGroup>
+    <div class="flex flex-none">
+      <!-- While Arc Spaces are left to import, the button offers them next to a blank Volet. -->
+      {#if arc?.offers.length}
+        <DropdownMenu items={() => newVoletMenu(sidebar, arc)}>
+          {#snippet trigger(props)}
+            <IconButton {...props} label="New Volet">
+              <Plus size={16} strokeWidth={2} />
+            </IconButton>
+          {/snippet}
+        </DropdownMenu>
+      {:else}
+        <IconButton label="New Volet" onclick={() => sidebar.createSpace()}>
+          <Plus size={16} strokeWidth={2} />
+        </IconButton>
+      {/if}
+      {#if palette}
+        <IconButton label="Search tabs and pins (⌘K)" onclick={() => palette.show()}>
+          <Search size={15} strokeWidth={2} />
+        </IconButton>
+      {/if}
+      <IconButton label="Settings" onclick={() => sidebar.openSettings()}>
+        <Settings size={15} strokeWidth={2} />
       </IconButton>
-    {/if}
-  </div>
+    </div>
+  </TooltipGroup>
 </nav>

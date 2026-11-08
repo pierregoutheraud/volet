@@ -121,7 +121,7 @@ Three layers, each with a single job. Dependencies point downward only.
   its color with its initial (`spaceInitial`); the active one opens into a pill with its name, its width animating
   (`interpolate-size`). While a row is dragged, the shutter open at its start stays open (`DragState.startSpaceId`):
   hovering another one switches Space, and opening it then would move the shutters under the pointer. Closed shutters narrow from 26px slots to 20px to fit next to the open one,
-  centered between the tools (Search, then Settings, in the corner) and New Volet (`SpaceSwitcher`), then the row scrolls (`primitives/scroll-strip.ts`): no scrollbar, a fade on each edge
+  aligned left, before New Volet and the tools (Search, then Settings, in the corner; `SpaceSwitcher`), then the row scrolls (`primitives/scroll-strip.ts`): no scrollbar, a fade on each edge
   that hides shutters, the wheel scrolls it, and the open shutter is kept in view (again once it has opened). Wheel
   events the row uses stop there, so they don't also swipe Spaces.
 - **Menus are data** (`model/menu.ts`), built by plain functions in `ui/sidebar/menus/` and rendered by the generic
