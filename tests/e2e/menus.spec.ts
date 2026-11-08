@@ -139,7 +139,8 @@ test('pins can be renamed and folders created from menus', async ({ worker, wind
   await expect
     .poll(async () => (await bookmarkTree(worker)).children!.find((c) => c.title === 'Volet 1 (click to rename)')!.children!.map((c) => c.title))
     .toEqual(['New folder', 'Weekly report']);
-  await expect(visiblePage(panel).getByRole('button', { name: 'New folder' })).toBeVisible();
+  // Exactly: until its row's button takes over as the drag handle, dnd-kit makes the folder's wrapper a button too.
+  await expect(visiblePage(panel).getByRole('button', { name: 'New folder', exact: true })).toBeVisible();
 });
 
 test('"New folder" on a folder adds one at the top of the Space; on a tab, puts the tab in it', async ({

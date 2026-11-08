@@ -249,6 +249,11 @@ Engine specifics:
   shadow roots, `NODE_ENV=production wxt build --mode e2e`: any other mode would otherwise compile Svelte for
   development) into Chromium, open the panel page in its own window (`sidepanel.html?windowId=<id>`), and assert on Chrome's real state from the service worker.
 - New behavior in the engine gets an e2e test; new pure logic gets a unit test.
+- E2e tests run in parallel (4 workers, `fullyParallel`, about 50 seconds in all): each test has its own Chromium and
+  profile, but they share the CPU, so write them for a loaded machine. Wait for a state, never for a delay; set things
+  up the way Volet does (a command sent from a page, as the panel would) rather than with Chrome calls the engine may
+  undo while it reconciles; and match names exactly where a wrapper could share them (dnd-kit makes a row's wrapper a
+  button until its own button takes over as the drag handle).
 - `tests/e2e/resilience.spec.ts` covers multiple windows and a real browser restart (same profile, session restored).
 - Playwright can't press Volet's shortcuts (browser-level gestures), but the worker can run its own handling of one:
   `chrome.commands.onCommand.dispatch(name, tab)` (`press` in `recent-tabs.spec.ts`). The palette's in-page overlay

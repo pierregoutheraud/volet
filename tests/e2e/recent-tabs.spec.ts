@@ -59,10 +59,19 @@ async function createRecentPages(context: BrowserContext, worker: Worker, window
     return names.map((name) => tabs.find((tab) => tab.url === `https://recent-tabs.test/${name}`)!.id!);
   }, { windowId, names });
   await worker.evaluate(async ({ ids, windowId }) => {
-    // Put an older tab in another Space to exercise switching across groups.
-    const groupId = await chrome.tabs.group({ tabIds: [ids[3]!], createProperties: { windowId } });
-    await chrome.tabGroups.update(groupId, { title: 'Another Volet' });
+    // Put an older tab in another Space to exercise switching across groups, the way Volet does: a Space folder, then
+    // the engine moves the tab (asked from a page, like the panel would). Grouping it here would race the engine,
+    // still reconciling the new tabs: it could put the tab back before the group had its name, and Chrome drop it.
+    const { root } = (await chrome.storage.local.get('root')) as { root: { rootId: string } };
+    const space = await chrome.bookmarks.create({ parentId: root.rootId, title: 'Another Volet' });
+    await chrome.scripting.executeScript({
+      target: { tabId: ids[5]! },
+      func: (command) => chrome.runtime.sendMessage({ type: 'command', command }),
+      args: [{ type: 'moveTab', windowId, tabId: ids[3]!, spaceId: space.id }],
+    });
   }, { ids, windowId });
+  await expect.poll(async () => (await stripState(worker, windowId)).find((tab) => tab.id === ids[3])?.group)
+    .toBe('Another Volet');
   await expect.poll(async () => (await stripState(worker, windowId)).find((tab) => tab.active)?.id).toBe(ids[5]);
   return ids;
 }
