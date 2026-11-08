@@ -38,6 +38,16 @@ function startPage(): RecentTabsHost {
   const cycle = feedCycle(feed, chromeRecentTabsClient({ onhue: (hue) => feed.tint(hue) }));
   const keys = listenRecentTabKeys(cycle, relayHoldsModifier);
   const stopClose = followCloseShortcut(keys.configure);
+  /**
+   * Opened by the Volet panel's button, which sends it the keys while it shows: the panel hears when it closes, however
+   * it does (a tab picked here, the page hidden), to have its keys back.
+   */
+  let fromPanel = false;
+  const stopClosedNotice = feed.subscribe(() => {
+    if (!fromPanel || cycle.active) return;
+    fromPanel = false;
+    browser.runtime.sendMessage({ type: 'recent-tabs:closed' }).catch(() => undefined);
+  });
   let overlay: Promise<void> | undefined;
   const loadOverlay = () => {
     overlay ??= loadRecentTabsOverlay().catch((error: unknown) => {
@@ -54,6 +64,11 @@ function startPage(): RecentTabsHost {
       loadOverlay();
       keys.step(value.shortcut, offset);
       respond({ ok: true });
+    } else if (value.type === 'recent-tabs:open') {
+      loadOverlay();
+      keys.open();
+      fromPanel = true;
+      respond({ ok: true });
     } else if (value.type === 'recent-tabs:relay-key' && 'key' in value && isRelayKey(value.key)) {
       keys.fromRelay(value.key);
       respond({ ok: true });
@@ -69,6 +84,7 @@ function startPage(): RecentTabsHost {
     dispose() {
       keys.dispose();
       stopClose();
+      stopClosedNotice();
       browser.runtime.onMessage.removeListener(message);
       host.removeOverlay?.();
       delete window.__voletRecentTabs;

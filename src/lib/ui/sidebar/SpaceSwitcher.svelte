@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { Plus, Search, Settings } from '@lucide/svelte';
+  import { GalleryHorizontalEnd, Plus, Search, Settings } from '@lucide/svelte';
   import { getArcClient } from '@/lib/model/arc';
   import { getSidebar } from '@/lib/model/context';
   import { spaceInitial } from '@/lib/model/initial';
+  import { getRecentTabsLauncher } from '@/lib/model/recent-tabs-launcher';
   import IconButton from '../primitives/IconButton.svelte';
   import ContextMenu from '../primitives/menu/ContextMenu.svelte';
   import DropdownMenu from '../primitives/menu/DropdownMenu.svelte';
@@ -24,6 +25,7 @@
   const order = getSpaceOrder();
   const drag = getDrag();
   const arc = getArcClient();
+  const recentTabs = getRecentTabsLauncher();
   const huePreview = getHuePreview();
 
   /** The open shutter: the active Space's, except mid-drag (see `DragState.startSpaceId`). */
@@ -90,8 +92,8 @@
     </ul>
   </TooltipGroup>
 
-  <!-- New Volet next to the shutters, then the tools for all of Volet, Settings in the corner.
-       The buttons touch, so their tooltip glides from one to the other. -->
+  <!-- New Volet next to the shutters, then the tools for all of Volet: Search, the recent tab switcher, and Settings
+       in the corner. The buttons touch, so their tooltip glides from one to the other. -->
   <TooltipGroup>
     <div class="flex flex-none">
       <!-- While Arc Spaces are left to import, the button offers them next to a blank Volet. -->
@@ -111,6 +113,20 @@
       {#if palette}
         <IconButton label="Search tabs and pins (⌘K)" onclick={() => palette.show()}>
           <Search size={15} strokeWidth={2} />
+        </IconButton>
+      {/if}
+      <!-- Opens the switcher over the page in front, and closes it again (a click anywhere else in the panel closes it,
+           but not one here: `data-recent-tabs-button`). -->
+      {#if recentTabs}
+        <IconButton
+          label="Recent tabs"
+          hint={recentTabs.shortcut ? `Recent tabs (${recentTabs.shortcut})` : undefined}
+          class="aria-pressed:bg-hover aria-pressed:text-ink"
+          aria-pressed={recentTabs.open}
+          data-recent-tabs-button
+          onclick={() => recentTabs.toggle()}
+        >
+          <GalleryHorizontalEnd size={15} strokeWidth={2} />
         </IconButton>
       {/if}
       <IconButton label="Settings" onclick={() => sidebar.openSettings()}>

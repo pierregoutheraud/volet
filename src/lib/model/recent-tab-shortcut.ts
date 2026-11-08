@@ -28,6 +28,11 @@ export function hasRecentTabShortcut(commands: readonly { name?: string; shortcu
   return commands.some((command) => (command.name === CYCLE_COMMAND || command.name === REVERSE_COMMAND) && Boolean(command.shortcut));
 }
 
+/** The cycling shortcut as Chrome shows it (`⌃Q` on a Mac, `Ctrl+Q` elsewhere), or empty while unassigned. */
+export function cycleShortcut(commands: readonly { name?: string; shortcut?: string }[]): string {
+  return commands.find((command) => command.name === CYCLE_COMMAND)?.shortcut ?? '';
+}
+
 /** Validate a modifier at the extension message boundary. */
 export function isCycleModifier(value: unknown): value is CycleModifier {
   return value === 'metaKey' || value === 'ctrlKey' || value === 'altKey';

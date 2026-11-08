@@ -121,7 +121,7 @@ Three layers, each with a single job. Dependencies point downward only.
   its color with its initial (`spaceInitial`); the active one opens into a pill with its name, its width animating
   (`interpolate-size`). While a row is dragged, the shutter open at its start stays open (`DragState.startSpaceId`):
   hovering another one switches Space, and opening it then would move the shutters under the pointer. Closed shutters narrow from 26px slots to 20px to fit next to the open one,
-  aligned left, before New Volet and the tools (Search, then Settings, in the corner; `SpaceSwitcher`), then the row scrolls (`primitives/scroll-strip.ts`): no scrollbar, a fade on each edge
+  aligned left, before New Volet and the tools (Search, Recent tabs, then Settings, in the corner; `SpaceSwitcher`), then the row scrolls (`primitives/scroll-strip.ts`): no scrollbar, a fade on each edge
   that hides shutters, the wheel scrolls it, and the open shutter is kept in view (again once it has opened). Wheel
   events the row uses stop there, so they don't also swipe Spaces.
 - **Menus are data** (`model/menu.ts`), built by plain functions in `ui/sidebar/menus/` and rendered by the generic
@@ -177,7 +177,9 @@ Three layers, each with a single job. Dependencies point downward only.
   modifier go down asks whoever has focus instead (`relayHoldsModifier`): its window's Volet panel
   (`recent-tabs:panel-holds`) and its own frames, through the worker (`recent-tabs:frames-hold`); the one holding it
   sends the page its keys (`ui/recent-tabs/relay-keys.ts`, `recent-tabs:relay-key`, the only message a frame may
-  send). All read keys through `model/recent-tab-keys.ts`, so they mean the same everywhere. The worker reads Chrome's
+  send). The panel's Recent tabs button opens it too (`RecentTabsLauncher`, `recent-tabs:open`): with no modifier to
+  let go of, it stays open until a tab is picked or it's dismissed (Escape, the button again, a click anywhere else),
+  and the panel, which has focus, sends it the keys until the page says it closed (`recent-tabs:closed`). All read keys through `model/recent-tab-keys.ts`, so they mean the same everywhere. The worker reads Chrome's
   shortcuts once per press before forwarding it, so letting go right after a press can reach the page first: the
   worker follows each press until the page has it (`engine/recent-tabs/presses.ts`), the page waits for those before
   switching (`recent-tabs:settle`), and one arriving meanwhile still counts (`RecentTabCycle.amend`). Only switching

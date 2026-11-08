@@ -8,15 +8,17 @@ import { loadRecentTabs } from './history';
 import type { PressesInFlight } from './presses';
 import type { RecentTabPreviews } from './previews';
 import { OVERLAY_FILE } from './registration';
+import { openRecentTabs } from './shortcuts';
 
 type Message = { type: unknown } & Record<string, unknown>;
 
 const isMessage = (value: unknown): value is Message => typeof value === 'object' && value !== null && 'type' in value;
 
 /**
- * The switcher's requests: from Volet's settings (`recent-tabs:setup`), from a page's top frame (its tabs, an action,
- * its overlay, asking its frames about the modifier, waiting for its presses), and from a page's frames (keys for the
- * top frame, the only message a frame may send). Only actions wait for the engine.
+ * The switcher's requests: from Volet's settings (`recent-tabs:setup`) and panel (`recent-tabs:open`, its button), from
+ * a page's top frame (its tabs, an action, its overlay, asking its frames about the modifier, waiting for its presses),
+ * and from a page's frames (keys for the top frame, the only message a frame may send). Only actions wait for the
+ * engine.
  */
 export function listenForRecentTabMessages({ engine, previews, presses, setup, log }: {
   engine: Engine;
@@ -27,14 +29,21 @@ export function listenForRecentTabMessages({ engine, previews, presses, setup, l
 }): void {
   browser.runtime.onMessage.addListener((message: unknown, sender, respond) => {
     if (!isMessage(message)) return;
-    const work = message.type === 'recent-tabs:setup'
+    const work = message.type === 'recent-tabs:setup' || message.type === 'recent-tabs:open'
       // Settings open in a tab, so their sender has one too: accept Volet's own pages, never a website.
-      ? sender.url?.startsWith(`${location.origin}/`) ? setup().then((ready) => ({ ready })) : undefined
+      ? sender.url?.startsWith(`${location.origin}/`) ? fromVolet(message) : undefined
       : fromPage(message, sender);
     if (!work) return;
     work.then(respond, (error: unknown) => { log(error); respond({ ok: false }); });
     return true;
   });
+
+  function fromVolet(message: Message): Promise<unknown> | undefined {
+    if (message.type === 'recent-tabs:setup') return setup().then((ready) => ({ ready }));
+    const windowId = message.windowId;
+    if (typeof windowId !== 'number' || !Number.isInteger(windowId)) return undefined;
+    return openRecentTabs(engine, windowId).then((tabId) => ({ tabId }));
+  }
 
   function fromPage(message: Message, sender: Browser.runtime.MessageSender): Promise<unknown> | undefined {
     const tab = sender.tab;

@@ -747,6 +747,66 @@ test('with the Volet panel focused, the held modifier shows the previews, panel 
   await expect.poll(() => activeId(worker, windowId)).toBe(ids[5]);
 });
 
+test("the panel's Recent tabs button opens the switcher until a tab is picked, the panel's keys driving it", async ({ context, worker, windowId, panel }) => {
+  const ids = await createRecentPages(context, worker, windowId);
+  const page = await recentPage(context, 'F');
+  const dialog = page.getByRole('dialog', { name: 'Recent tabs' });
+  const selected = dialog.locator('[aria-current="true"]');
+  const button = panel.getByRole('button', { name: 'Recent tabs', exact: true });
+  /** Whether the panel keeps a key from its own handlers, to send it to the switcher. */
+  const panelSendsKeys = () => panel.evaluate(() => {
+    const event = new KeyboardEvent('keydown', { key: 'ArrowRight', cancelable: true });
+    window.dispatchEvent(event);
+    return event.defaultPrevented;
+  });
+  // Its tooltip names the shortcut, as Chrome shows it.
+  const shortcut = await worker.evaluate(async () =>
+    (await chrome.commands.getAll()).find((command) => command.name === 'cycle-recent-tabs')?.shortcut);
+  expect(shortcut).toBeTruthy();
+  await button.hover();
+  await expect(panel.locator('[data-tooltip-content]:not([data-state="closed"])')).toHaveText(`Recent tabs (${shortcut})`);
+  await panel.bringToFront();
+  await button.click();
+  await expect(button).toHaveAttribute('aria-pressed', 'true');
+  await expect(dialog.locator('[data-recent-tab]')).toHaveCount(5);
+  await expect(selected).toHaveAttribute('aria-label', 'Recent E');
+  // No modifier to let go of: it stays open while the panel's keys drive it, and Enter switches.
+  await panel.keyboard.press('ArrowRight');
+  await expect(selected).toHaveAttribute('aria-label', 'Recent D');
+  expect(await activeId(worker, windowId)).toBe(ids[5]);
+  await panel.keyboard.press('Enter');
+  await expect.poll(() => activeId(worker, windowId)).toBe(ids[3]);
+  await expect(dialog).toHaveCount(0);
+  await expect(button).toHaveAttribute('aria-pressed', 'false');
+
+  // The button closes it again, and so do Escape and a click anywhere else in the panel: the tab stays.
+  const switched = (await recentPage(context, 'D')).getByRole('dialog', { name: 'Recent tabs' });
+  const open = async () => {
+    await button.click();
+    await expect(button).toHaveAttribute('aria-pressed', 'true');
+    await expect(switched.locator('[data-recent-tab]')).toHaveCount(5);
+  };
+  await open();
+  await button.click();
+  await expect(switched).toHaveCount(0);
+  await open();
+  await panel.keyboard.press('Escape');
+  await expect(switched).toHaveCount(0);
+  await open();
+  await panel.getByRole('navigation', { name: 'Volets' }).click({ position: { x: 2, y: 2 } });
+  await expect(switched).toHaveCount(0);
+  await expect(button).toHaveAttribute('aria-pressed', 'false');
+  expect(await activeId(worker, windowId)).toBe(ids[3]);
+
+  // A card clicked on the page switches, and the panel has its keys back.
+  await open();
+  expect(await panelSendsKeys()).toBe(true);
+  await switched.getByRole('button', { name: 'Recent C', exact: true }).click();
+  await expect.poll(() => activeId(worker, windowId)).toBe(ids[2]);
+  await expect(button).toHaveAttribute('aria-pressed', 'false');
+  expect(await panelSendsKeys()).toBe(false);
+});
+
 test('the switcher shows on a page that hides undefined custom elements, like reddit.com', async ({ context, worker, windowId }) => {
   // Sites built from web components hide elements not defined yet; content scripts can't define the switcher's host.
   await context.route('https://recent-tabs.test/Components', (route) => route.fulfill({

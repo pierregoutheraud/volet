@@ -3,6 +3,7 @@
   import { type ArcClient, setArcClient } from '@/lib/model/arc';
   import { setSidebar } from '@/lib/model/context';
   import type { PaletteClient } from '@/lib/model/palette';
+  import { type RecentTabsLauncher, setRecentTabsLauncher } from '@/lib/model/recent-tabs-launcher';
   import type { SidebarStore } from '@/lib/model/types';
   import { colorScheme } from '../primitives/color-scheme';
   import { MountQueue } from '../primitives/mount-queue';
@@ -31,11 +32,13 @@
     palette?: PaletteClient;
     /** Arc's first-run card and the Arc Spaces offered by the New Volet button. */
     arc?: ArcClient;
+    /** The bottom bar's button for the recent tab switcher, which shows over the page in front. */
+    recentTabs?: RecentTabsLauncher;
     /** Force a color scheme (the prototype uses this); defaults to the system's. */
     scheme?: 'light' | 'dark';
   }
 
-  let { store, palette, arc, scheme }: Props = $props();
+  let { store, palette, arc, recentTabs, scheme }: Props = $props();
 
   // The store is created once at mount and never replaced.
   // svelte-ignore state_referenced_locally
@@ -47,6 +50,8 @@
   setMountQueue(new MountQueue());
   // svelte-ignore state_referenced_locally
   setArcClient(arc);
+  // svelte-ignore state_referenced_locally
+  setRecentTabsLauncher(recentTabs);
   // svelte-ignore state_referenced_locally
   const panelPalette = setPanelPalette(palette ? new PanelPaletteState() : undefined);
 

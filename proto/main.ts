@@ -12,5 +12,12 @@ const scheme = theme === 'dark' || theme === 'light' ? theme : undefined;
 const store = new FakeSidebarStore();
 mount(Sidebar, {
   target: document.getElementById('app')!,
-  props: { store, palette: fakePaletteClient(store), arc: new FakeArcClient(store), scheme },
+  props: {
+    store,
+    palette: fakePaletteClient(store),
+    arc: new FakeArcClient(store),
+    // The switcher shows over web pages, which the prototype has none of (/recent-tabs.html has it on its own).
+    recentTabs: { open: false, shortcut: '⌃Q', toggle: () => undefined },
+    scheme,
+  },
 });

@@ -13,6 +13,7 @@ interface Watcher { by: 'page' | 'relay' | 'asking' }
 export function listenRecentTabKeys(cycle: RecentTabCycle, relayHolds: (modifier: CycleModifier) => Promise<boolean>): {
   configure: (closeShortcut: string) => void;
   step: (shortcut: string, offset?: 1 | -1) => void;
+  open: () => void;
   fromRelay: (key: RelayKey) => void;
   dispose: () => void;
 } {
@@ -81,6 +82,15 @@ export function listenRecentTabKeys(cycle: RecentTabCycle, relayHolds: (modifier
         if (holds) asking.by = 'relay';
         else cycle.commit();
       });
+    },
+    /**
+     * Opened by a click on the Volet panel's button: there's no modifier to let go of, so it stays open until a tab is
+     * chosen or it's dismissed. The panel has focus, so it sends the keys, until a click on the page brings them here.
+     */
+    open() {
+      modifier = undefined;
+      watcher = { by: 'relay' };
+      if (!cycle.active) cycle.step(1);
     },
     fromRelay(key) {
       if (!cycle.active || !watcher || watcher.by === 'page') return;
