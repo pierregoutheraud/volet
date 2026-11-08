@@ -38,7 +38,7 @@
   role="option"
   tabindex="-1"
   aria-selected={selected}
-  class={['flex h-10 cursor-default items-center gap-3 rounded-lg px-3', selected && 'bg-hover']}
+  class={['flex h-10 items-center gap-3 rounded-lg px-3', selected && 'bg-hover']}
   onclick={onpick}
   onkeydown={(event) => event.key === 'Enter' && onpick()}
   onmousemove={onhover}

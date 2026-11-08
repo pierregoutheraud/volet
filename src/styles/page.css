@@ -4,6 +4,7 @@
 @import './tokens.css';
 @import './theme.css';
 @import './menu-surface.css';
+@import './pointer.css';
 
 @source '../lib';
 

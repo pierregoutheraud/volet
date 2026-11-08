@@ -13,7 +13,7 @@
 <!-- Drop a file here, or click (or press Space) to choose one. The label opens the file input. -->
 <label
   class={[
-    'flex w-full cursor-default flex-col items-center gap-1 rounded-xl border-2 border-dashed px-4 py-8 text-center transition-colors focus-within:border-(--focus)',
+    'flex w-full flex-col items-center gap-1 rounded-xl border-2 border-dashed px-4 py-8 text-center transition-colors focus-within:border-(--focus)',
     over ? 'border-(--focus) bg-hover' : 'border-rule hover:bg-hover',
   ]}
   ondragover={(event) => {

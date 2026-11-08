@@ -3,6 +3,7 @@
 @import '../../../styles/tokens.css';
 @import '../../../styles/theme.css';
 @import '../../../styles/page-scales.css';
+@import '../../../styles/pointer.css';
 
 /* Classes used by the switcher's components and the shared favicon. */
 @source './';

@@ -25,7 +25,7 @@
 <div class="group relative w-[186px] min-w-30">
   <!-- Rounded like the panel's rows: hovered like a row, selected with the Volet's tint, like selected rows. -->
   <button
-    class={['w-full cursor-pointer rounded-[10px] p-2 text-left transition-colors duration-100',
+    class={['w-full rounded-[10px] p-2 text-left transition-colors duration-100',
       selected ? 'bg-selected' : 'hover:bg-hover']}
     data-recent-tab
     aria-label={tab.title}
@@ -54,7 +54,7 @@
   </button>
   <!-- The panel's row buttons, on a chip so they read over a screenshot: on the selected card, or under the pointer. -->
   <button
-    class={['absolute top-3 right-3 grid size-6 cursor-pointer place-items-center rounded-[7px] bg-(--menu)',
+    class={['absolute top-3 right-3 grid size-6 place-items-center rounded-[7px] bg-(--menu)',
       'text-ink-muted transition-[opacity,color] duration-100 *:pointer-events-none hover:text-ink',
       'focus-visible:outline-offset-1 [box-shadow:var(--pill-shadow)]',
       !selected && ['pointer-events-none opacity-0 group-focus-within:pointer-events-auto group-focus-within:opacity-100',

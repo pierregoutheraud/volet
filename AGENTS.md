@@ -230,7 +230,9 @@ Svelte specifics:
   `@keyframes`, custom utilities (`@utility scroll-strip`), and surfaces shared by several components that utilities
   adjust where they're used (`@layer components`: `.menu-surface` in `styles/menu-surface.css`, `.tooltip-surface`).
   No component `<style>` blocks. Hooks for tests and code are data attributes (`data-row`, `data-recent-tab`), not
-  class names.
+  class names. Anything clicked to act shows the pointer on every surface (`styles/pointer.css`, in each one's base
+  layer): new buttons, menu items and options need no `cursor-pointer`; set a cursor only where another fits better
+  (`cursor-text` on a name renamed in place, `cursor-default` on a backdrop that only dismisses).
 - Accessibility floor: real buttons, labels on icon-only buttons, visible focus, respect `prefers-reduced-motion`.
 
 Engine specifics:

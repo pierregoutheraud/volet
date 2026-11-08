@@ -22,7 +22,7 @@
 <!-- One choice among a few: a button like the pages' others, opening a list like Volet's menus. -->
 <Select.Root type="single" {value} onValueChange={onchange} items={options}>
   <Select.Trigger
-    class="flex h-9 cursor-pointer items-center gap-2 rounded-lg bg-hover pr-2.5 pl-3 text-[14px] transition-colors hover:bg-rule data-[state=open]:bg-rule"
+    class="flex h-9 items-center gap-2 rounded-lg bg-hover pr-2.5 pl-3 text-[14px] transition-colors hover:bg-rule data-[state=open]:bg-rule"
     aria-label={label}
   >
     {selected?.label}

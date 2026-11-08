@@ -1,0 +1,24 @@
+/*
+ * Anything clicked to act shows the pointer, on every surface: buttons, menu items, options, and labels that toggle or
+ * pick a file (Tailwind's preflight leaves buttons with the arrow). In the base layer, so a utility still wins where
+ * another cursor fits: the text cursor on a name renamed in place, the arrow over a backdrop that only dismisses.
+ */
+@layer base {
+  :is(
+      button,
+      [role='button'],
+      [role='menuitem'],
+      [role='menuitemcheckbox'],
+      [role='menuitemradio'],
+      [role='option'],
+      [role='tab'],
+      [role='switch'],
+      a[href],
+      summary,
+      input[type='checkbox'],
+      input[type='radio'],
+      label:has(input[type='checkbox'], input[type='radio'], input[type='file'])
+    ):not(:disabled, [aria-disabled='true'], [data-disabled]) {
+    cursor: pointer;
+  }
+}

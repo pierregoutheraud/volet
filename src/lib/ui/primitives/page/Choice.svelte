@@ -12,7 +12,7 @@
   let { label, detail, hue, checked, ontoggle }: Props = $props();
 </script>
 
-<label class="flex h-9 cursor-default items-center gap-3 rounded-lg px-2 hover:bg-hover">
+<label class="flex h-9 items-center gap-3 rounded-lg px-2 hover:bg-hover">
   <input type="checkbox" class="size-4 accent-(--focus)" {checked} onchange={ontoggle} />
   {#if hue !== undefined}
     <span class="block size-2.5 flex-none rounded-full" style:background="oklch(var(--dot-l) var(--dot-c) {hue})"></span>

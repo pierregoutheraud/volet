@@ -25,7 +25,7 @@
     <div class="flex gap-1.5">
       {#each hues as hue (hue)}
         <ContextMenu.Item
-          class="grid size-6 cursor-default place-items-center rounded-full outline-none data-highlighted:ring-2 data-highlighted:ring-(--focus) [[data-unfocused]_&:hover]:ring-2 [[data-unfocused]_&:hover]:ring-(--focus)"
+          class="grid size-6 place-items-center rounded-full outline-none data-highlighted:ring-2 data-highlighted:ring-(--focus) [[data-unfocused]_&:hover]:ring-2 [[data-unfocused]_&:hover]:ring-(--focus)"
           aria-label="Hue {hue}"
           onSelect={() => onSelect(hue)}
         >

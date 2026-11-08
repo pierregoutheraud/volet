@@ -20,7 +20,7 @@
     style:--space-hue={state.hue}
   >
     <!-- No dimming: the switcher is a glance while the shortcut is held, like the macOS switcher. -->
-    <button class="absolute inset-0 size-full" aria-label="Cancel tab switching" onclick={oncancel}></button>
+    <button class="absolute inset-0 size-full cursor-default" aria-label="Cancel tab switching" onclick={oncancel}></button>
     <!-- Search's surface. Not modal: a glance while the shortcut is held, the page keeps its focus. -->
     <div
       class="relative w-max max-w-[calc(100vw-32px)] rounded-[14px] bg-(--menu) p-2 [box-shadow:var(--overlay-shadow)]"

@@ -3,6 +3,7 @@
 @import './styles/tokens.css';
 @import './styles/theme.css';
 @import './styles/menu-surface.css';
+@import './styles/pointer.css';
 
 /* Scan all of src/ for classes, whichever Vite root (WXT or the prototype) is building. */
 @source '.';
