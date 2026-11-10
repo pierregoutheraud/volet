@@ -24,6 +24,9 @@ To do its job, Volet reads, on your device only:
 When you search from Volet's palette, the search goes to your default search engine through Chrome, the same way as
 a search typed in the address bar.
 
+When you press the copy shortcut, Volet writes the current tab's address to your clipboard. It never reads the
+clipboard.
+
 ## Where it's kept
 
 - **Bookmarks** (the "Volet" folder): your Volets, pins, folders and favorites.

@@ -15,7 +15,7 @@ export const KEYBOARD_SHORTCUT_GROUPS = [
   // Cycling before cycling in reverse, as on Chrome's shortcuts page, which sorts by command id.
   { title: TAB_SWITCHER_GROUP, commands: ['cycle-recent-tabs', 'cycle-recent-tabs-reverse'] },
   { title: 'Volets', commands: ['next-space', 'previous-space'] },
-  { title: 'Tabs', commands: ['toggle-pin'] },
+  { title: 'Tabs', commands: ['toggle-pin', 'copy-url'] },
 ];
 
 /** Keep every declared action visible even when its binding is not set. */

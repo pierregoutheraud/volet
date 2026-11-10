@@ -61,6 +61,7 @@ export default defineConfig({
       'next-space': { description: 'Switch to the next Volet' },
       'previous-space': { description: 'Switch to the previous Volet' },
       'toggle-pin': { description: 'Pin or unpin the current tab' },
+      'copy-url': { description: "Copy the current tab's link" },
     },
   },
 });

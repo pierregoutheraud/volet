@@ -56,6 +56,7 @@ sent anywhere else: see the [privacy policy](PRIVACY.md).
 | Close highlighted preview tab | not set, record in Volet settings |
 | Next / previous Space | not set |
 | Pin or unpin the current tab | not set |
+| Copy the current tab's link | not set (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd> works well on a Mac) |
 
 Ctrl is the Control key on a Mac too, not Cmd. Change native shortcuts in `chrome://extensions/shortcuts` (Settings
 has a link). Chrome lets an extension suggest at most four, so the others start unassigned. Record and clear the preview-only close
@@ -69,6 +70,8 @@ the preview is open.
 - The side panel's width and side are set by Chrome.
 - The palette can't appear on Chrome's own pages (`chrome://`, the new tab page, the Web Store); there it opens in the
   sidebar instead. So it does from the sidebar's search button when Volet's website access is withheld.
+- Copying the current tab's link does nothing on Chrome's own pages or with the keyboard in the address bar (Volet
+  writes the clipboard from the page or the sidebar, whichever has the keyboard, and asks for no clipboard permission).
 - The recent tab switcher cannot overlay Chrome pages or the Web Store: its shortcut switches directly to the previous
   tab there. Holding the modifier to choose needs focus in a website (any of its frames) or the Volet panel: with focus
   in the address bar or elsewhere in Chrome's own interface, a press switches straight to the previous tab.

@@ -1,0 +1,20 @@
+/* Styles for the confirmations shown over web pages ("Link copied"), inside their own shadow root: Volet's tokens. */
+@import 'tailwindcss' source(none);
+@import '../../../styles/tokens.css';
+@import '../../../styles/theme.css';
+@import '../../../styles/page-scales.css';
+
+/* Classes used by the confirmation's components. */
+@source './';
+@source '../primitives/Toast.svelte';
+
+/*
+ * Utilities do the rest. Inside a shadow root, avoid the ones built on @property (shadow-*, ring-*, transforms,
+ * border widths), which Chrome doesn't register there: write those as properties ([box-shadow:var(--overlay-shadow)]).
+ */
+
+/*
+ * The page's own rules for the host win over a normal :host rule, and pages built from web components hide elements
+ * that aren't defined yet (reddit's :not(:defined)), which content scripts can't define. An important :host rule wins.
+ */
+:host { all: initial !important; }

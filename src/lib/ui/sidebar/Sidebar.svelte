@@ -9,6 +9,7 @@
   import { colorScheme } from '../primitives/color-scheme';
   import { MountQueue } from '../primitives/mount-queue';
   import Pager from '../primitives/Pager.svelte';
+  import type { ToastState } from '../toast/toast-state.svelte';
   import ArcInvite from './ArcInvite.svelte';
   import DragLayer from './drag/DragLayer.svelte';
   import ConfirmHost from './editing/ConfirmHost.svelte';
@@ -19,6 +20,7 @@
   import { HuePreview, setHuePreview } from './hue-preview.svelte';
   import { setMountQueue } from './mount';
   import PanelSearch from './palette/PanelSearch.svelte';
+  import PanelToast from './PanelToast.svelte';
   import SelectionDismiss from './selection/SelectionDismiss.svelte';
   import { Selection, setSelection } from './selection/selection.svelte';
   import SpacePage from './SpacePage.svelte';
@@ -32,6 +34,8 @@
     search?: SearchLauncher;
     /** Search in the panel, where nothing can show over the page. */
     palette?: PaletteClient;
+    /** Short confirmations at the panel's top ("Link copied"). */
+    toast?: ToastState;
     /** Arc's first-run card and the Arc Spaces offered by the New Volet button. */
     arc?: ArcClient;
     /** The bottom bar's button for the recent tab switcher, which shows over the page in front. */
@@ -40,7 +44,7 @@
     scheme?: 'light' | 'dark';
   }
 
-  let { store, search, palette, arc, recentTabs, scheme }: Props = $props();
+  let { store, search, palette, toast, arc, recentTabs, scheme }: Props = $props();
 
   // The store is created once at mount and never replaced.
   // svelte-ignore state_referenced_locally
@@ -109,6 +113,9 @@
       <SelectionDismiss />
       {#if search && palette}
         <PanelSearch {search} client={palette} />
+      {/if}
+      {#if toast}
+        <PanelToast {toast} />
       {/if}
     </DragLayer>
   </Tooltip.Provider>

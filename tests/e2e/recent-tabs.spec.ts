@@ -588,6 +588,7 @@ test.describe('default preview shortcuts', () => {
     expect(shortcut('toggle-sidebar')).toMatch(/^(⌃B|Ctrl\+B)$/);
     // Chrome won't load an extension suggesting more than four shortcuts: pinning gave up its default.
     expect(shortcut('toggle-pin')).toBe('');
+    expect(shortcut('copy-url')).toBe('');
     const previous = await context.newPage();
     await previous.goto('https://recent-tabs.test/Previous');
     const page = await context.newPage();

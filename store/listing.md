@@ -64,7 +64,7 @@ KEYBOARD SHORTCUTS
 • Ctrl+M: search
 • Ctrl+Q: cycle through your recent tabs, hold Ctrl to pick one (Ctrl+Shift+Q in reverse)
 • On a Mac, these use the Control key too
-• Next and previous Volet, pin or unpin the current tab: set your own in chrome://extensions/shortcuts
+• Next and previous Volet, pin or unpin the current tab, copy its link: set your own in chrome://extensions/shortcuts
 
 GOOD TO KNOW
 • Chrome's own tab strip stays at the top; Volet keeps it tidy by collapsing the other Volets' groups.
@@ -146,13 +146,13 @@ The search palette's "Search for..." result runs the query with the user's defau
 `activeTab`
 
 ```
-When the user presses the search shortcut, the search palette opens over the page they are on. activeTab keeps that working on the current tab, only after the user's shortcut, when the user has withheld Volet's website access in Chrome.
+When the user presses the search shortcut, the search palette opens over the page they are on. When the user presses the copy shortcut, the page they are on copies its own link to the clipboard and says so. activeTab keeps both working on the current tab, only after the user's shortcut, when the user has withheld Volet's website access in Chrome.
 ```
 
 `scripting`
 
 ```
-Injects the search palette into the current page when the user presses its shortcut or the search button in Volet's side panel. Registers the recent tab switcher's small listener on websites (in their frames too, where the keyboard focus may be) for its shortcut's modifier being released, and adds the switcher's overlay to a page the first time the user presses its shortcut there. All scripts are part of the extension package; no remote code.
+Injects the search palette into the current page when the user presses its shortcut or the search button in Volet's side panel, and a small script that copies the page's link when the user presses the copy shortcut. Registers the recent tab switcher's small listener on websites (in their frames too, where the keyboard focus may be) for its shortcut's modifier being released, and adds the switcher's overlay to a page the first time the user presses its shortcut there. All scripts are part of the extension package; no remote code.
 ```
 
 **Host permissions**: `<all_urls>`, for the recent tab switcher (on by default; removing both of its shortcuts turns it off) and for the search palette opened from the side panel. Chrome shows

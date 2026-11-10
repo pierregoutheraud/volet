@@ -85,7 +85,13 @@ Three layers, each with a single job. Dependencies point downward only.
 - **Pure logic is kept pure** (`derive.ts`, `snapshot.ts`, `colors.ts`, importers, search ranking) so it can be unit tested without Chrome.
 - **Entry points** (`src/entrypoints/`): `background.ts` (the engine), `sidepanel/` (the sidebar), `palette.ts`
   (Search, unlisted, added by the worker to the current page's top frame and rendered in a shadow root: see Search
-  below), `options/` (settings) and `import/` (Arc import).
+  below), `copy-url.ts` (the copy shortcut's page side: see below), `options/` (settings) and `import/` (Arc
+  import).
+- **Copy the current tab's link** (`copy-url`, unassigned: Chrome's four suggestions are taken): the worker can't write
+  the clipboard and Volet asks for no clipboard permission, so whatever has the keyboard writes it
+  (`engine/copy-url.ts`): the window's panel when it has it (`answerCopyRequests`, like `panelHasFocus`), else the page,
+  through a small script the worker adds to it (`entrypoints/copy-url.ts`), which says so at its top (`PageToast`,
+  `ToastState`; the panel shows the same `Toast` pill, `PanelToast`). Nothing on Chrome's own pages.
 - **Search** (`entrypoints/palette.ts`, `ui/palette/`): one Search, over the page in front. Added to a page, it sets
   itself up once; the shortcut then toggles it (`palette:toggle`) and the panel connects to it. Chrome can't move the
   keyboard from the side panel to the page, so when the panel opens Search (its button, ⌘K, "/", or the shortcut

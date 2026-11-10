@@ -1,6 +1,7 @@
 import { browser, type Browser } from 'wxt/browser';
 import { PALETTE_TOGGLE } from '@/lib/model/palette-relay';
 import { canHostOverlay } from '@/lib/model/url';
+import { copyUrl } from './copy-url';
 import type { Engine } from './engine';
 import { injectPalette } from './palette/open';
 import type { CycleRecentTabs } from './recent-tabs/listeners';
@@ -27,6 +28,9 @@ export function listenForShortcuts(engine: Engine, cycleRecentTabs: CycleRecentT
         if (windowId !== undefined) {
           void engine.run({ type: 'shiftSpace', windowId, offset: command === 'next-space' ? 1 : -1 });
         }
+        break;
+      case 'copy-url':
+        copyUrl(tab).catch((error: unknown) => console.warn('Copy URL failed', error));
         break;
       case 'toggle-pin':
         if (windowId !== undefined && tab?.id !== undefined) {

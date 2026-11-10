@@ -1,9 +1,10 @@
 /*
  * Design tokens, shared by the side panel (.sidebar), the in-page palette (.palette-root),
- * the extension's pages (.page-root) and the in-page tab switcher (.recent-tabs-root).
+ * the extension's pages (.page-root), the in-page tab switcher (.recent-tabs-root) and the in-page confirmations
+ * (.toast-root).
  * They live on those roots (not :root) so they resolve against the root's --space-hue.
  */
-:where(.sidebar, .palette-root, .page-root, .recent-tabs-root) {
+:where(.sidebar, .palette-root, .page-root, .recent-tabs-root, .toast-root) {
   --wash-top: oklch(0.87 0.085 var(--space-hue));
   --wash-bottom: oklch(0.935 0.045 calc(var(--space-hue) + 35));
   --ink: oklch(0.27 0.035 var(--space-hue));
@@ -29,7 +30,7 @@
   color: var(--ink);
 }
 
-:where(.sidebar, .palette-root, .page-root, .recent-tabs-root)[data-scheme='dark'] {
+:where(.sidebar, .palette-root, .page-root, .recent-tabs-root, .toast-root)[data-scheme='dark'] {
   --wash-top: oklch(0.31 0.07 var(--space-hue));
   --wash-bottom: oklch(0.21 0.035 calc(var(--space-hue) + 35));
   --ink: oklch(0.95 0.015 var(--space-hue));
