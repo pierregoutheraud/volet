@@ -28,7 +28,7 @@ VOLETS
 PINNED TABS AND FOLDERS
 • Pins keep their page: wander off and the row shows where you are, with a button to go back.
 • Close a pin's tab and the pin stays, ready for next time. Unpin it in one click.
-• Folders nest, and a collapsed folder still shows the tabs open inside it.
+• Folders nest, and a collapsed folder still shows the tabs open inside it (or hides them too, if you prefer, in Volet's settings).
 
 FAVORITES
 • A grid of your most used sites at the top, shared by every Volet.
@@ -44,10 +44,12 @@ DRAG AND DROP
 
 SEARCH PALETTE
 • Press Ctrl+M (Control+M on a Mac too) on any page to search your open tabs in every window, your pins, favorites, archived tabs and Volets, open a web address, or search the web.
+• Or click the search button in the sidebar: the same palette opens over the page, and you type right from the sidebar.
 
 RECENT TAB SWITCHER
 • Hold Ctrl (Control on a Mac too) and press Q to see your five most recent tabs in this window, with a preview of each, across Volets. Let go to switch: a quick tap goes back to the tab you last used, like Cmd+Tab.
 • Add Shift to go the other way. The arrow keys move the selection, Escape cancels, and you can close a tab right from the switcher.
+• Or open it from its button in the sidebar, then pick a tab with a click or the arrow keys and Enter.
 
 RIGHT-CLICK MENUS
 • Rename, move to another Volet, put in a new folder, change a Volet's color, and more, on every tab, pin, folder, favorite and Volet.
