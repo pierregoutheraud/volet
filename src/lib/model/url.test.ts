@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isNewTabPage, sameUrl, shortUrl } from './url';
+import { canHostOverlay, isNewTabPage, sameUrl, shortUrl } from './url';
 
 describe('sameUrl', () => {
   it('ignores differences that keep you on the same page', () => {
@@ -29,5 +29,21 @@ describe('isNewTabPage', () => {
     expect(isNewTabPage(undefined)).toBe(true);
     expect(isNewTabPage('https://google.com')).toBe(false);
     expect(isNewTabPage('chrome://settings')).toBe(false);
+  });
+});
+
+describe('canHostOverlay', () => {
+  it('shows over websites and local files', () => {
+    expect(canHostOverlay('https://example.com/a')).toBe(true);
+    expect(canHostOverlay('http://localhost:3000/')).toBe(true);
+    expect(canHostOverlay('file:///Users/me/notes.html')).toBe(true);
+  });
+
+  it("never over Chrome's own pages, extensions' pages or the Web Store", () => {
+    for (const url of ['chrome://newtab/', 'chrome://settings', 'chrome-search://local-ntp/', 'chrome-extension://abc/options.html',
+      'about:blank', 'view-source:https://example.com', 'https://chromewebstore.google.com/detail/x',
+      'https://chrome.google.com/webstore/detail/x', '', undefined]) {
+      expect(canHostOverlay(url)).toBe(false);
+    }
   });
 });

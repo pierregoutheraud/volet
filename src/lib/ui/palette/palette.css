@@ -17,6 +17,18 @@
   all: initial !important;
 }
 
+/* The caret drawn while the Volet panel types into Search (`RelayCaret`): on half the time, like the system's. */
+@keyframes caret-blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  50.01%,
+  100% {
+    opacity: 0;
+  }
+}
+
 /* In the base layer so utilities like outline-none can override it. */
 @layer base {
   :focus-visible {

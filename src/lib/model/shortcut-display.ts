@@ -24,6 +24,11 @@ export function defaultShortcutKeys(suggested: SuggestedShortcut | undefined, os
   return normalizeShortcutKeys(os === 'mac' ? shortcut.replace(/\bCtrl\b/g, 'Command') : shortcut);
 }
 
+/** A command's shortcut as Chrome shows it (`⌃M` on a Mac, `Ctrl+M` elsewhere), or empty while unassigned. */
+export function commandShortcut(commands: readonly { name?: string; shortcut?: string }[], name: string): string {
+  return commands.find((command) => command.name === name)?.shortcut ?? '';
+}
+
 /** An empty binding stays unassigned even when a manifest default exists. */
 export function shortcutBindingKind(value: string, defaultKeys = ''): 'unset' | 'default' | 'custom' {
   if (!value) return 'unset';

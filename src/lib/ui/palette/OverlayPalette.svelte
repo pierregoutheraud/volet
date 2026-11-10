@@ -1,15 +1,19 @@
 <script lang="ts">
-  import type { PaletteClient } from '@/lib/model/palette';
   import { colorScheme } from '../primitives/color-scheme';
+  import type { PageRelay } from './page-relay.svelte';
   import PaletteBox from './PaletteBox.svelte';
+  import type { PaletteState } from './palette-state.svelte';
 
-  let { client, onclose }: { client: PaletteClient; onclose: () => void } = $props();
-
-  let hue = $state(268);
+  let { palette, relay, onclose }: { palette: PaletteState; relay: PageRelay; onclose: () => void } = $props();
 </script>
 
-<!-- The palette over a web page: a dimmed backdrop and a centered box tinted like the sidebar. -->
-<div class="palette-root fixed inset-0 z-2147483647 font-sans antialiased" data-scheme={colorScheme()} style:--space-hue={hue}>
+<!-- The palette over a web page: a dimmed backdrop and a centered box tinted like the sidebar (the active Volet's hue,
+     which comes with each answer; Search's default until then). -->
+<div
+  class="palette-root fixed inset-0 z-2147483647 font-sans antialiased"
+  data-scheme={colorScheme()}
+  style:--space-hue={palette.hue ?? 268}
+>
   <div class="absolute inset-0 bg-[oklch(0.2_0.03_var(--space-hue)/0.28)]" aria-hidden="true" onclick={onclose}></div>
   <!-- Positioned without transforms: Tailwind's are built on @property, which a shadow root ignores. -->
   <div
@@ -18,6 +22,6 @@
     aria-modal="true"
     aria-label="Search"
   >
-    <PaletteBox {client} {onclose} onhue={(next) => (hue = next)} />
+    <PaletteBox {palette} {onclose} caret={relay.caret} onfocus={() => relay.native()} />
   </div>
 </div>

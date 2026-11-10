@@ -31,7 +31,8 @@ export async function panelHasFocus(windowId: number): Promise<boolean> {
   }
 }
 
-async function isPanelOpen(windowId: number): Promise<boolean> {
+/** Whether the window shows the panel, as far as its open and close events tell. */
+export async function isPanelOpen(windowId: number): Promise<boolean> {
   return Boolean((await openPanelsItem.getValue())[windowId]);
 }
 

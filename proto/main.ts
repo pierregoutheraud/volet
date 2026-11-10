@@ -1,6 +1,7 @@
 import { mount } from 'svelte';
 import { FakeArcClient } from '@/lib/state/fake/fake-arc.svelte';
 import { fakePaletteClient } from '@/lib/state/fake/fake-palette';
+import { FakeSearchLauncher } from '@/lib/state/fake/fake-search.svelte';
 import { FakeSidebarStore } from '@/lib/state/fake/fake-store.svelte';
 import Sidebar from '@/lib/ui/sidebar/Sidebar.svelte';
 import '@/app.css';
@@ -14,6 +15,7 @@ mount(Sidebar, {
   target: document.getElementById('app')!,
   props: {
     store,
+    search: new FakeSearchLauncher(),
     palette: fakePaletteClient(store),
     arc: new FakeArcClient(store),
     // The switcher shows over web pages, which the prototype has none of (/recent-tabs.html has it on its own).

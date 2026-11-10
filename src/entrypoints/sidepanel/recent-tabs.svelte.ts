@@ -1,5 +1,7 @@
 import { previewCloseShortcutItem } from '@/lib/engine/recent-tabs/preview-close-shortcut-storage';
+import { CYCLE_COMMAND } from '@/lib/model/recent-tab-shortcut';
 import type { RecentTabsLauncher } from '@/lib/model/recent-tabs-launcher';
+import { watchCommandShortcut } from '@/lib/state/chrome/command-shortcut';
 import { chromeRecentTabsPanel } from '@/lib/state/chrome/recent-tabs-panel';
 import { watchRelayedRecentTabKeys } from '@/lib/ui/recent-tabs/relay-keys';
 
@@ -14,13 +16,7 @@ export function relayRecentTabKeys(windowId: number): RecentTabsLauncher {
   client.onAsk(keys.holds);
   client.onClosed(keys.ended);
   let shortcut = $state('');
-  const readShortcut = () => {
-    client.shortcut().then((value) => { shortcut = value; }).catch(() => undefined);
-  };
-  readShortcut();
-  // Chrome reports no change to shortcuts: read it again as the pointer comes back, maybe from Chrome's shortcuts page.
-  document.documentElement.addEventListener('pointerenter', readShortcut);
-  window.addEventListener('focus', readShortcut);
+  watchCommandShortcut(CYCLE_COMMAND, (value) => { shortcut = value; });
   const configure = (value: unknown) => keys.configure(typeof value === 'string' ? value : '');
   void previewCloseShortcutItem.getValue().then(configure).catch(() => undefined);
   previewCloseShortcutItem.watch(configure);

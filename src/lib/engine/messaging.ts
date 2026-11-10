@@ -1,6 +1,7 @@
 import { browser } from 'wxt/browser';
 import { activeSpaceOf, loadContext } from './context';
 import type { Engine } from './engine';
+import { openSearch } from './palette/open';
 import { searchPalette } from './palette/search';
 import { toCommand } from './palette/to-command';
 import type { CommandResult, RuntimeMessage } from './protocol';
@@ -8,7 +9,7 @@ import { errorMessage } from './retry';
 
 const failure = (error: unknown): CommandResult => ({ ok: false, error: errorMessage(error) });
 
-/** Answer messages from side panels and the in-page palette. */
+/** Answer messages from side panels and Search over a page. */
 export function listenForMessages(engine: Engine): void {
   browser.runtime.onMessage.addListener((message: RuntimeMessage, sender, sendResponse) => {
     const respond = (work: Promise<unknown>) => {
@@ -44,6 +45,10 @@ export function listenForMessages(engine: Engine): void {
           })(),
         );
       }
+      case 'palette:open':
+        // From Volet's own pages only (the panel), never a website.
+        if (!sender.url?.startsWith(`${location.origin}/`) || !Number.isInteger(message.windowId)) return undefined;
+        return respond(openSearch(message.windowId));
       default:
         return undefined;
     }

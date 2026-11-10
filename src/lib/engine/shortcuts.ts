@@ -1,14 +1,11 @@
 import { browser, type Browser } from 'wxt/browser';
+import { PALETTE_TOGGLE } from '@/lib/model/palette-relay';
+import { canHostOverlay } from '@/lib/model/url';
 import type { Engine } from './engine';
+import { injectPalette } from './palette/open';
 import type { CycleRecentTabs } from './recent-tabs/listeners';
-import { panelHasFocus, toggleSidePanel } from './side-panel';
+import { isPanelOpen, panelHasFocus, toggleSidePanel } from './side-panel';
 import { pendingPaletteItem } from './storage';
-
-/** Pages an extension can't run scripts in: the palette opens in the side panel instead. */
-const NO_SCRIPTS = /^(chrome|chrome-extension|chrome-search|chrome-untrusted|devtools|edge|brave|about|view-source):/i;
-const WEB_STORE = /^https:\/\/(chromewebstore\.google\.com|chrome\.google\.com\/webstore)/i;
-
-const PALETTE_SCRIPT = '/palette.js';
 
 /** Keyboard shortcuts declared in the manifest's `commands`; the switcher's are `listenForRecentTabs`'. */
 export function listenForShortcuts(engine: Engine, cycleRecentTabs: CycleRecentTabs): void {
@@ -41,36 +38,44 @@ export function listenForShortcuts(engine: Engine, cycleRecentTabs: CycleRecentT
 }
 
 /**
- * Show the palette where the keyboard is: over the page (the shortcut grants temporary access), or in the side panel
- * when it has focus (the page would get none of its keys, not even Escape) or the page can't host it.
+ * Show or close Search over the page (the shortcut grants temporary access). With the panel focused, the page would get
+ * none of its keys, not even Escape: the panel opens it then, and sends it the keys (`openSearch`). Where nothing can
+ * show over the page, the panel shows its own.
  */
 function openPalette(tab: Browser.tabs.Tab | undefined): void {
   if (tab?.windowId === undefined) return;
   const windowId = tab.windowId;
   // The committed URL on purpose, not `tabUrl()`: the script runs in the page showing, not one still loading.
-  const url = tab.url ?? '';
-  if (tab.id === undefined || !url || NO_SCRIPTS.test(url) || WEB_STORE.test(url)) {
+  if (tab.id === undefined || !canHostOverlay(tab.url)) {
     openInPanel(windowId); // synchronous: sidePanel.open only works during the shortcut's gesture
     return;
   }
   const tabId = tab.id;
-  void panelHasFocus(windowId).then((focused) => {
+  void panelHasFocus(windowId).then(async (focused) => {
     if (focused) {
-      requestPanelPalette(windowId); // the panel is open (it has focus): no need to open it
+      requestPanelSearch(windowId); // the panel is open (it has focus): no need to open it
       return;
     }
-    browser.scripting
-      .executeScript({ target: { tabId }, files: [PALETTE_SCRIPT] })
-      .catch(() => openInPanel(windowId)); // e.g. file:// pages without file access
+    try {
+      await injectPalette(tabId);
+      await browser.tabs.sendMessage(tabId, { type: PALETTE_TOGGLE }, { frameId: 0 });
+    } catch {
+      // e.g. file:// pages without file access. Too late to open the panel (the gesture is over): only an open one can
+      // show Search, and a flag left for a closed one would open Search whenever it next opens.
+      if (await isPanelOpen(windowId)) requestPanelSearch(windowId);
+    }
   });
 }
 
 function openInPanel(windowId: number): void {
   browser.sidePanel.open({ windowId }).catch(() => undefined);
-  requestPanelPalette(windowId);
+  requestPanelSearch(windowId);
 }
 
-/** Leave the window's panel a flag to open its palette, now or once it opens (`watchPaletteRequests`). */
-function requestPanelPalette(windowId: number): void {
+/**
+ * Leave the window's panel a flag to toggle its Search, now or once it opens (`watchPaletteRequests`): over the page,
+ * or in the panel where nothing can show over the page.
+ */
+function requestPanelSearch(windowId: number): void {
   void pendingPaletteItem.getValue().then((pending) => pendingPaletteItem.setValue({ ...pending, [windowId]: true }));
 }

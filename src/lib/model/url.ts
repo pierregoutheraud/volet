@@ -22,6 +22,19 @@ function normalize(url: string): string {
   }
 }
 
+/** Pages no extension can run scripts in: Chrome's own, extensions' (Volet's too), the source viewer. */
+const NO_SCRIPTS = /^(chrome|chrome-extension|chrome-search|chrome-untrusted|devtools|edge|brave|about|view-source):/i;
+/** The Chrome Web Store, which Chrome keeps extensions' scripts out of. */
+const WEB_STORE = /^https:\/\/(chromewebstore\.google\.com|chrome\.google\.com\/webstore)/i;
+
+/**
+ * Whether Volet can show something over the page at this URL (Search, the tab switcher). Chrome may still refuse it
+ * one (a file:// page without file access, a site the user withholds access to).
+ */
+export function canHostOverlay(url: string | undefined): boolean {
+  return Boolean(url) && !NO_SCRIPTS.test(url!) && !WEB_STORE.test(url!);
+}
+
 /** Whether the URL is Chrome's New Tab page (a blank tab, as far as the user is concerned). */
 export function isNewTabPage(url: string | undefined): boolean {
   return !url || url.startsWith('chrome://newtab') || url.startsWith('chrome://new-tab-page');

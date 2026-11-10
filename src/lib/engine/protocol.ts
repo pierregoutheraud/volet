@@ -77,6 +77,12 @@ export interface PaletteRunMessage {
   item: PaletteItem;
 }
 
-export type RuntimeMessage = CommandMessage | HelloMessage | PaletteQueryMessage | PaletteRunMessage;
+/** From the Volet panel: Search over the window's active page, or in the panel where nothing can show there. */
+export interface PaletteOpenMessage {
+  type: 'palette:open';
+  windowId: number;
+}
+
+export type RuntimeMessage = CommandMessage | HelloMessage | PaletteQueryMessage | PaletteRunMessage | PaletteOpenMessage;
 
 export type CommandResult = { ok: true; value?: unknown } | { ok: false; error: string };

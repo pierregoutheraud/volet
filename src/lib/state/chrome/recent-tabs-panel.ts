@@ -1,6 +1,6 @@
 import { browser, type Browser } from 'wxt/browser';
 import type { RelayKey } from '@/lib/model/recent-tab-keys';
-import { cycleShortcut, isCycleModifier, type CycleModifier } from '@/lib/model/recent-tab-shortcut';
+import { isCycleModifier, type CycleModifier } from '@/lib/model/recent-tab-shortcut';
 
 type Respond = (response: unknown) => void;
 
@@ -10,7 +10,6 @@ export function chromeRecentTabsPanel(windowId: number): {
   send: (tabId: number, key: RelayKey) => void;
   open: () => Promise<number | undefined>;
   onClosed: (closed: (tabId: number) => void) => () => void;
-  shortcut: () => Promise<string>;
 } {
   /** Messages of `type` from the top frame of a page in this window. */
   const fromPage = (type: string, handle: (message: object, tabId: number, respond: Respond) => void) => {
@@ -42,10 +41,6 @@ export function chromeRecentTabsPanel(windowId: number): {
     /** A page closed the switcher the panel opened on it, however it closed. */
     onClosed(closed) {
       return fromPage('recent-tabs:closed', (_message, tabId) => closed(tabId));
-    },
-    /** The cycling shortcut as Chrome shows it. Chrome reports no change to shortcuts: ask again when it may have one. */
-    async shortcut() {
-      return cycleShortcut(await browser.commands.getAll());
     },
   };
 }

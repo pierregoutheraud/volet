@@ -152,14 +152,14 @@ When the user presses the search shortcut, the search palette opens over the pag
 `scripting`
 
 ```
-Injects the search palette into the current page when the user presses its shortcut. Registers the recent tab switcher's small listener on websites (in their frames too, where the keyboard focus may be) for its shortcut's modifier being released, and adds the switcher's overlay to a page the first time the user presses its shortcut there. All scripts are part of the extension package; no remote code.
+Injects the search palette into the current page when the user presses its shortcut or the search button in Volet's side panel. Registers the recent tab switcher's small listener on websites (in their frames too, where the keyboard focus may be) for its shortcut's modifier being released, and adds the switcher's overlay to a page the first time the user presses its shortcut there. All scripts are part of the extension package; no remote code.
 ```
 
-**Host permissions**: `<all_urls>`, for the recent tab switcher (on by default; removing both of its shortcuts turns it off). Chrome shows
+**Host permissions**: `<all_urls>`, for the recent tab switcher (on by default; removing both of its shortcuts turns it off) and for the search palette opened from the side panel. Chrome shows
 it at install ("Read and change all your data on all websites") and puts the item through a closer review.
 
 ```
-The recent tab switcher (on by default; removing both of its shortcuts turns it off) needs website access for three things. Chrome's keyboard commands only report the shortcut being pressed, so a packaged content script listens on websites for its modifier being released, which picks the tab. The same script draws the centered switcher over the page. And Volet captures a preview of the visible page as tabs are visited. Previews are small images kept in memory on the device (ten at most), are never synced or uploaded, are shown in a closed shadow root that websites can't read, and incognito pages are not captured.
+The recent tab switcher (on by default; removing both of its shortcuts turns it off) needs website access for three things. Chrome's keyboard commands only report the shortcut being pressed, so a packaged content script listens on websites for its modifier being released, which picks the tab. The same script draws the centered switcher over the page. And Volet captures a preview of the visible page as tabs are visited. Previews are small images kept in memory on the device (ten at most), are never synced or uploaded, are shown in a closed shadow root that websites can't read, and incognito pages are not captured. Website access also lets the search palette opened from Volet's side panel show over the current page, as a click in the side panel doesn't grant activeTab.
 ```
 
 (The manifest also makes `_favicon/*` web accessible so the in-page search palette can show site icons from Chrome's

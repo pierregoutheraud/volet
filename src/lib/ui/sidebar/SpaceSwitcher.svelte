@@ -4,6 +4,7 @@
   import { getSidebar } from '@/lib/model/context';
   import { spaceInitial } from '@/lib/model/initial';
   import { getRecentTabsLauncher } from '@/lib/model/recent-tabs-launcher';
+  import { getSearchLauncher } from '@/lib/model/search-launcher';
   import IconButton from '../primitives/IconButton.svelte';
   import ContextMenu from '../primitives/menu/ContextMenu.svelte';
   import DropdownMenu from '../primitives/menu/DropdownMenu.svelte';
@@ -17,11 +18,10 @@
   import { getMenuContext } from './menus/menu-context';
   import { newVoletMenu } from './menus/new-volet-menu';
   import { spaceMenu } from './menus/space-menu';
-  import { getPanelPalette } from './palette/panel-palette-state.svelte';
 
   const sidebar = getSidebar();
   const menus = getMenuContext();
-  const palette = getPanelPalette();
+  const search = getSearchLauncher();
   const order = getSpaceOrder();
   const drag = getDrag();
   const arc = getArcClient();
@@ -110,8 +110,17 @@
           <Plus size={16} strokeWidth={2} />
         </IconButton>
       {/if}
-      {#if palette}
-        <IconButton label="Search tabs and pins (⌘K)" onclick={() => palette.show()}>
+      <!-- Opens Search over the page in front, and closes it again. While it shows, the keyboard stays in its field
+           (no focus on press), so this click closes Search rather than the field losing the keyboard first. -->
+      {#if search}
+        <IconButton
+          label="Search tabs and pins"
+          hint={search.shortcut ? `Search tabs and pins (${search.shortcut})` : undefined}
+          class="aria-pressed:bg-hover aria-pressed:text-ink"
+          aria-pressed={search.mode !== 'closed'}
+          onmousedown={(event: MouseEvent) => search.mode === 'page' && event.preventDefault()}
+          onclick={() => search.toggle()}
+        >
           <Search size={15} strokeWidth={2} />
         </IconButton>
       {/if}

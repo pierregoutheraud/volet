@@ -84,9 +84,21 @@ Three layers, each with a single job. Dependencies point downward only.
   "Coming from Arc?" card (`ArcInvite`, `arcInviteItem`) opens the import until it's dismissed or used.
 - **Pure logic is kept pure** (`derive.ts`, `snapshot.ts`, `colors.ts`, importers, search ranking) so it can be unit tested without Chrome.
 - **Entry points** (`src/entrypoints/`): `background.ts` (the engine), `sidepanel/` (the sidebar), `palette.ts`
-  (unlisted script injected into the current page by the palette shortcut, rendered in a shadow root; with the panel
-  focused, the shortcut opens the panel's own palette instead, as the page would get none of its keys:
-  `panelHasFocus`, answered by `state/chrome/panel-focus.ts`), `options/` (settings) and `import/` (Arc import).
+  (Search, unlisted, added by the worker to the current page's top frame and rendered in a shadow root: see Search
+  below), `options/` (settings) and `import/` (Arc import).
+- **Search** (`entrypoints/palette.ts`, `ui/palette/`): one Search, over the page in front. Added to a page, it sets
+  itself up once; the shortcut then toggles it (`palette:toggle`) and the panel connects to it. Chrome can't move the
+  keyboard from the side panel to the page, so when the panel opens Search (its button, ⌘K, "/", or the shortcut
+  pressed while the panel has focus: `panelHasFocus`, then the `pendingPaletteItem` flag), the worker adds it to the
+  page (`palette:open`, `openSearch`) and the panel connects a port (`palette-relay`, `model/palette-relay.ts`,
+  `SearchLauncher` in `entrypoints/sidepanel/search.svelte.ts`). A hidden field in the panel (`RelayInput`) takes the
+  typing, input methods and paste included, and sends its text and selection, which Search shows as its own with a
+  drawn caret (`RelayCaret`); the keys that move through results go as keys (`paletteKey`, shared with the page's own
+  field). Either side letting go ends it: Search closes when the panel lets go (Escape, the button again, a click
+  elsewhere in the panel), unless the user clicked into its field, where typing goes on (`PageRelay.native`); the
+  panel's field goes when Search closes, however it does. Where nothing can show over the page (`canHostOverlay`:
+  Chrome's pages, the Web Store; or no site access, as a click in the panel grants no activeTab), Search opens in the
+  panel instead (`PanelPalette`), and only there.
 - **Drag and drop** (`ui/sidebar/drag/`): nothing moves while dragging. `DragState.drop` is where the rows would
   land, shown as a line in the gap next to a row (`DropLine`, drawn by `SortableEntry`), a lit-up folder row (its
   middle drops into it) or a lit-up empty list (`DropZone`; the unpinned tabs have no empty hint to light up, so
@@ -260,8 +272,9 @@ Engine specifics:
   button until its own button takes over as the drag handle).
 - `tests/e2e/resilience.spec.ts` covers multiple windows and a real browser restart (same profile, session restored).
 - Playwright can't press Volet's shortcuts (browser-level gestures), but the worker can run its own handling of one:
-  `chrome.commands.onCommand.dispatch(name, tab)` (`press` in `recent-tabs.spec.ts`). The palette's in-page overlay
-  is tested on its own; the panel palette exercises the same components and worker messages.
+  `chrome.commands.onCommand.dispatch(name, tab)` (`press` in `recent-tabs.spec.ts`). Search is tested over a page,
+  typed into from the panel. Headless Chromium never hides a background tab, so closing on `visibilitychange`
+  (Search, the tab switcher) has no e2e test.
 
 ## Writing style
 

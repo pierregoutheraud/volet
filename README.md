@@ -27,8 +27,9 @@ A rewrite inspired by [Arcify](https://github.com/nisargkolhe/arcify) (GPL-3.0),
   Space's name), move to another Space, put a tab in a new folder, add a new folder at the top of the Space (from a
   pin, folder or the Space) or inside a folder, Space colors, reorder and delete Spaces, and more.
 - **Search palette.** Press <kbd>Ctrl</kbd>+<kbd>M</kbd> on any page for an Arc-style palette over it: open tabs (all windows),
-  pins, favorites, archived tabs, Spaces, actions, a web address, or a web search. In the sidebar: the search button,
-  <kbd>⌘K</kbd>/<kbd>Ctrl+K</kbd>, or <kbd>/</kbd>, and <kbd>Ctrl</kbd>+<kbd>M</kbd> too while the sidebar has focus.
+  pins, favorites, archived tabs, Spaces, actions, a web address, or a web search. From the sidebar (the search button,
+  <kbd>⌘K</kbd>/<kbd>Ctrl+K</kbd>, <kbd>/</kbd>, or <kbd>Ctrl</kbd>+<kbd>M</kbd> while it has focus), the same palette
+  opens over the page, and you type into it from the sidebar.
 - **Import from Arc.** Settings → Import from Arc reads Arc's `StorableSidebar.json` and brings over your Spaces, their
   colors, pinned tabs, folders and favorites. The file never leaves your computer.
 - **Recent tab switcher.** Hold <kbd>Ctrl</kbd> and press <kbd>Q</kbd> to cycle through your five most recent tabs
@@ -66,7 +67,8 @@ the preview is open.
 - Chrome's own tab strip stays at the top. Spaces keep it tidy by collapsing other Spaces' groups; Chrome's built-in
   vertical tabs can replace it if you prefer.
 - The side panel's width and side are set by Chrome.
-- The palette can't appear on Chrome's own pages (`chrome://`, the Web Store); there it opens in the sidebar instead.
+- The palette can't appear on Chrome's own pages (`chrome://`, the new tab page, the Web Store); there it opens in the
+  sidebar instead. So it does from the sidebar's search button when Volet's website access is withheld.
 - The recent tab switcher cannot overlay Chrome pages or the Web Store: its shortcut switches directly to the previous
   tab there. Holding the modifier to choose needs focus in a website (any of its frames) or the Volet panel: with focus
   in the address bar or elsewhere in Chrome's own interface, a press switches straight to the previous tab.

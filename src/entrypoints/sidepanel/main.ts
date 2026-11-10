@@ -6,6 +6,7 @@ import { answerPanelFocus } from '@/lib/state/chrome/panel-focus';
 import { watchPaletteRequests } from '@/lib/state/chrome/palette-requests';
 import Sidebar from '@/lib/ui/sidebar/Sidebar.svelte';
 import { relayRecentTabKeys } from './recent-tabs.svelte';
+import { panelSearch } from './search.svelte';
 import '@/app.css';
 
 async function main() {
@@ -16,10 +17,11 @@ async function main() {
   answerPanelFocus(windowId);
   const store = new ChromeSidebarStore(windowId);
   await store.start();
-  const palette = { ...chromePaletteClient(windowId), onOpenRequest: watchPaletteRequests(windowId) };
+  const search = panelSearch(windowId, watchPaletteRequests(windowId));
+  const palette = chromePaletteClient(windowId);
   const arc = new ChromeArcClient();
   await arc.start();
-  mount(Sidebar, { target: document.getElementById('app')!, props: { store, palette, arc, recentTabs } });
+  mount(Sidebar, { target: document.getElementById('app')!, props: { store, search, palette, arc, recentTabs } });
 }
 
 void main();

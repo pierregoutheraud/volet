@@ -25,7 +25,8 @@ export default defineConfig({
     // sidePanel.open and setPanelBehavior (116); the switcher's page script in frames with no address of their own
     // (`matchOriginAsFallback`, 119). Newer side panel events are feature-detected (engine/side-panel.ts).
     minimum_chrome_version: '119',
-    // activeTab + scripting: the palette shortcut may show the palette on the current page only.
+    // activeTab + scripting: Search over the current page, after its shortcut even without site access (activeTab);
+    // from the panel's button, with site access (a click in the panel grants no activeTab).
     permissions: [
       'sidePanel',
       'tabs',
@@ -39,7 +40,7 @@ export default defineConfig({
       'scripting',
     ],
     // The recent tab switcher (on while one of its shortcuts is assigned) listens on websites for the shortcut's modifier
-    // being let go, and captures local page previews as tabs are used.
+    // being let go, and captures local page previews as tabs are used. Search opened from the panel shows over the page.
     host_permissions: ['<all_urls>'],
     // The in-page palette shows favicons from Chrome's cache, served from the extension's origin.
     web_accessible_resources: [{ resources: ['_favicon/*'], matches: ['<all_urls>'] }],

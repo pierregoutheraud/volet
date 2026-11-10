@@ -25,8 +25,8 @@ const SHOTS = [
   { file: 'marquee-1400x560.png', scene: 'marquee', size: [1400, 560], scale: 1 },
 ];
 
+/** Search shows under the headline with the keyboard in it, as over a page: type into it. */
 async function openPalette(page) {
-  await page.keyboard.press('/');
   await page.keyboard.type('de', { delay: 40 });
 }
 

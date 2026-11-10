@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { defaultShortcutKeys, normalizeShortcutKeys, shortcutBindingKind } from './shortcut-display';
+import { commandShortcut, defaultShortcutKeys, normalizeShortcutKeys, shortcutBindingKind } from './shortcut-display';
 
 it('formats native and recorded shortcuts with the same key names', () => {
   expect(normalizeShortcutKeys('⇧⌘E')).toBe('Cmd+Shift+E');
@@ -23,4 +23,16 @@ it('resolves real manifest defaults for each platform instead of hardcoding a sh
   expect(defaultShortcutKeys({ default: 'Alt+S' }, 'linux')).toBe('Alt+S');
   expect(defaultShortcutKeys({ mac: 'MacCtrl+S' }, 'mac')).toBe('Ctrl+S');
   expect(defaultShortcutKeys(undefined, 'mac')).toBe('');
+});
+
+it("shows a command's shortcut as Chrome does, and none while it's unassigned", () => {
+  const commands = (search?: string) => [
+    { name: 'toggle-sidebar', shortcut: '⌃B' },
+    { name: 'open-palette', shortcut: search },
+  ];
+  expect(commandShortcut(commands('⌃M'), 'open-palette')).toBe('⌃M');
+  expect(commandShortcut(commands('Ctrl+M'), 'open-palette')).toBe('Ctrl+M');
+  expect(commandShortcut(commands(''), 'open-palette')).toBe('');
+  expect(commandShortcut(commands(), 'open-palette')).toBe('');
+  expect(commandShortcut(commands('⌃M'), 'cycle-recent-tabs')).toBe('');
 });

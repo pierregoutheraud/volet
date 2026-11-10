@@ -1,8 +1,8 @@
 import { pendingPaletteItem } from '@/lib/engine/storage';
 
 /**
- * Open the panel's palette when the shortcut was pressed on a page that can't
- * host it (the worker leaves a flag for this window), now or later.
+ * Toggle Search when the shortcut asks the panel (the worker leaves a flag for this window), now or once the panel
+ * opens: the panel had the keyboard, so Search over the page needs its keys, or the page can't show Search.
  */
 export function watchPaletteRequests(windowId: number) {
   return (open: () => void): void => {

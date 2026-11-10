@@ -1,20 +1,19 @@
 import type { PaletteClient, PaletteItem } from '@/lib/model/palette';
+import type { PaletteKey } from '@/lib/model/palette-relay';
 
 /** The palette's query, results and selection. Out-of-order search answers are dropped. */
 export class PaletteState {
   query = $state('');
   items = $state.raw<PaletteItem[]>([]);
   selected = $state(0);
+  /** The active Space's hue, which comes with each answer, so hosts can tint themselves. */
   hue = $state<number | undefined>();
 
   #client: PaletteClient;
-  #onhue: ((hue: number) => void) | undefined;
   #latest = 0;
 
-  /** `onhue` hears the active Space's hue with each answer, so hosts can tint themselves. */
-  constructor(client: PaletteClient, onhue?: (hue: number) => void) {
+  constructor(client: PaletteClient) {
     this.#client = client;
-    this.#onhue = onhue;
   }
 
   async search(text: string): Promise<void> {
@@ -25,7 +24,6 @@ export class PaletteState {
     this.items = results.items;
     this.hue = results.hue;
     this.selected = 0;
-    this.#onhue?.(results.hue);
   }
 
   move(delta: number): void {
@@ -35,6 +33,14 @@ export class PaletteState {
 
   select(index: number): void {
     this.selected = index;
+  }
+
+  /** What a key does, typed here or in the Volet panel: move through the results, run one, or close (`done`). */
+  async press(key: PaletteKey, done: () => void): Promise<void> {
+    if (key === 'next') this.move(1);
+    else if (key === 'previous') this.move(-1);
+    else if (key === 'close') done();
+    else if (await this.run()) done();
   }
 
   /** Run the selected (or given) result. Resolves once it has run. */

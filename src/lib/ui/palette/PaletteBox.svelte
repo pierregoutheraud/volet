@@ -1,21 +1,21 @@
 <script lang="ts">
-  import type { PaletteClient } from '@/lib/model/palette';
   import PaletteView from '../primitives/palette/PaletteView.svelte';
-  import { PaletteState } from './palette-state.svelte';
+  import type { PaletteState } from './palette-state.svelte';
 
   interface Props {
-    client: PaletteClient;
+    /** Made by whoever shows Search, so the Volet panel can type into it too (`PageRelay`). */
+    palette: PaletteState;
     onclose: () => void;
-    /** Reports the active Space's hue, so the host can tint itself. */
-    onhue?: (hue: number) => void;
+    /** Where the caret is while the Volet panel types into Search (see `PaletteView`). */
+    caret?: { start: number; end: number };
+    onfocus?: () => void;
   }
 
-  let { client, onclose, onhue }: Props = $props();
+  let { palette, onclose, caret, onfocus }: Props = $props();
 
-  // The client and callback are fixed for the palette's lifetime.
+  // Results for what Search holds as it appears (nothing yet, usually).
   // svelte-ignore state_referenced_locally
-  const palette = new PaletteState(client, (hue) => onhue?.(hue));
-  void palette.search('');
+  void palette.search(palette.query);
 
   async function pick(index: number) {
     if (await palette.run(index)) onclose();
@@ -27,8 +27,9 @@
   items={palette.items}
   selected={palette.selected}
   oninput={(text) => void palette.search(text)}
-  onmove={(delta) => palette.move(delta)}
+  onkey={(key) => void palette.press(key, onclose)}
   onpick={(index) => void pick(index)}
   onhover={(index) => palette.select(index)}
-  {onclose}
+  {caret}
+  {onfocus}
 />

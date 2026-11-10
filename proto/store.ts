@@ -18,6 +18,8 @@ interface Scene {
   space?: string;
   /** Keep Arc's first-run card and the Arc Spaces offered by New Volet. */
   arc?: boolean;
+  /** Show Search as it opens over a page. */
+  searching?: boolean;
 }
 
 const TAGLINE = 'Vertical tabs in Chrome, sorted into workspaces.';
@@ -39,6 +41,7 @@ const SCENES = {
     shot: 'screenshot',
     headline: 'Find any tab in a keystroke',
     detail: 'Open tabs, pins, favorites, archived tabs or the web, from any page.',
+    searching: true,
   },
   drag: {
     shot: 'screenshot',
@@ -77,5 +80,6 @@ mount(StoreFrame, {
     headline: scene.headline ?? '',
     detail: scene.detail,
     scheme: scene.scheme,
+    searching: scene.searching,
   },
 });

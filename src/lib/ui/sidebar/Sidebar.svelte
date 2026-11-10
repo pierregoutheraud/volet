@@ -4,6 +4,7 @@
   import { setSidebar } from '@/lib/model/context';
   import type { PaletteClient } from '@/lib/model/palette';
   import { type RecentTabsLauncher, setRecentTabsLauncher } from '@/lib/model/recent-tabs-launcher';
+  import { type SearchLauncher, setSearchLauncher } from '@/lib/model/search-launcher';
   import type { SidebarStore } from '@/lib/model/types';
   import { colorScheme } from '../primitives/color-scheme';
   import { MountQueue } from '../primitives/mount-queue';
@@ -17,8 +18,7 @@
   import FavoritesGrid from './FavoritesGrid.svelte';
   import { HuePreview, setHuePreview } from './hue-preview.svelte';
   import { setMountQueue } from './mount';
-  import { PanelPaletteState, setPanelPalette } from './palette/panel-palette-state.svelte';
-  import PanelPalette from './palette/PanelPalette.svelte';
+  import PanelSearch from './palette/PanelSearch.svelte';
   import SelectionDismiss from './selection/SelectionDismiss.svelte';
   import { Selection, setSelection } from './selection/selection.svelte';
   import SpacePage from './SpacePage.svelte';
@@ -28,7 +28,9 @@
 
   interface Props {
     store: SidebarStore;
-    /** Enables search (the bottom bar button, ⌘K, and the shortcut's side panel fallback). */
+    /** Search: the bottom bar's button, ⌘K and "/", over the page in front (or in the panel where it can't show). */
+    search?: SearchLauncher;
+    /** Search in the panel, where nothing can show over the page. */
     palette?: PaletteClient;
     /** Arc's first-run card and the Arc Spaces offered by the New Volet button. */
     arc?: ArcClient;
@@ -38,7 +40,7 @@
     scheme?: 'light' | 'dark';
   }
 
-  let { store, palette, arc, recentTabs, scheme }: Props = $props();
+  let { store, search, palette, arc, recentTabs, scheme }: Props = $props();
 
   // The store is created once at mount and never replaced.
   // svelte-ignore state_referenced_locally
@@ -53,7 +55,7 @@
   // svelte-ignore state_referenced_locally
   setRecentTabsLauncher(recentTabs);
   // svelte-ignore state_referenced_locally
-  const panelPalette = setPanelPalette(palette ? new PanelPaletteState() : undefined);
+  setSearchLauncher(search);
 
   const activeIndex = $derived(Math.max(0, sidebar.spaces.findIndex((space) => space.id === sidebar.activeSpaceId)));
 
@@ -105,8 +107,8 @@
       <SpaceSwitcher />
       <ConfirmHost />
       <SelectionDismiss />
-      {#if palette && panelPalette}
-        <PanelPalette client={palette} state={panelPalette} />
+      {#if search && palette}
+        <PanelSearch {search} client={palette} />
       {/if}
     </DragLayer>
   </Tooltip.Provider>

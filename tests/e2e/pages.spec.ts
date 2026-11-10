@@ -100,7 +100,7 @@ test('the settings page changes how long unpinned tabs stay open', async ({ cont
 
 test("the panel's Settings button, next to Search, opens Volet's settings", async ({ context, panel }) => {
   const bar = panel.getByRole('navigation', { name: 'Volets' });
-  const search = await bar.getByRole('button', { name: 'Search tabs and pins (⌘K)' }).boundingBox();
+  const search = await bar.getByRole('button', { name: 'Search tabs and pins', exact: true }).boundingBox();
   const settings = bar.getByRole('button', { name: 'Settings', exact: true });
   expect((await settings.boundingBox())!.x).toBeGreaterThan(search!.x);
   await settings.click();
@@ -181,7 +181,8 @@ test('idle tabs are archived, and the palette reopens them', async ({ worker, wi
   }, tabId);
   await expect.poll(async () => (await stripState(worker, windowId)).some((tab) => tab.id === tabId), { timeout: 45_000 }).toBe(false);
 
-  await panel.getByRole('button', { name: /^Search tabs and pins/ }).click();
+  // The window shows a blank tab, which Search can't show over: it opens in the panel.
+  await panel.getByRole('button', { name: 'Search tabs and pins', exact: true }).click();
   await panel.getByRole('combobox').fill('old notes');
   await expect(panel.getByRole('option').first()).toContainText('Archived');
   await panel.getByRole('combobox').press('Enter');
