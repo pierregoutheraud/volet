@@ -1,5 +1,5 @@
 import { browser } from 'wxt/browser';
-import { DEFAULT_SETTINGS, archiveItem, settingsItem } from '@/lib/engine/storage';
+import { DEFAULT_SETTINGS, archiveItem, completeSettings, settingsItem, type Settings } from '@/lib/engine/storage';
 import { KEYBOARD_SHORTCUT_GROUPS, type KeyboardShortcut } from '@/lib/model/keyboard-shortcuts';
 import { defaultShortcutKeys } from '@/lib/model/shortcut-display';
 
@@ -12,6 +12,7 @@ const SHORTCUT_ORDER = KEYBOARD_SHORTCUT_GROUPS.flatMap((group) => group.command
 /** The settings page's data: preferences, shortcuts, the archive. Preferences are written directly. */
 export class SettingsStore {
   archiveAfterHours = $state(DEFAULT_SETTINGS.archiveAfterHours);
+  collapsedFoldersShowOpenTabs = $state(DEFAULT_SETTINGS.collapsedFoldersShowOpenTabs);
   shortcuts = $state.raw<KeyboardShortcut[]>([]);
   archivedCount = $state(0);
   /** The keys that open search, if assigned. */
@@ -23,9 +24,9 @@ export class SettingsStore {
       this.refreshShortcuts(),
       archiveItem.getValue(),
     ]);
-    this.archiveAfterHours = settings.archiveAfterHours;
+    this.#show(settings);
     this.archivedCount = archive.length;
-    settingsItem.watch((next) => (this.archiveAfterHours = next.archiveAfterHours));
+    settingsItem.watch((next) => this.#show(next));
     archiveItem.watch((next) => (this.archivedCount = next.length));
   }
 
@@ -46,7 +47,22 @@ export class SettingsStore {
 
   async setArchiveAfter(hours: number): Promise<void> {
     this.archiveAfterHours = hours;
-    await settingsItem.setValue({ ...(await settingsItem.getValue()), archiveAfterHours: hours });
+    await this.#save({ archiveAfterHours: hours });
+  }
+
+  async setCollapsedFoldersShowOpenTabs(on: boolean): Promise<void> {
+    this.collapsedFoldersShowOpenTabs = on;
+    await this.#save({ collapsedFoldersShowOpenTabs: on });
+  }
+
+  #show(stored: Partial<Settings> | null): void {
+    const settings = completeSettings(stored);
+    this.archiveAfterHours = settings.archiveAfterHours;
+    this.collapsedFoldersShowOpenTabs = settings.collapsedFoldersShowOpenTabs;
+  }
+
+  async #save(change: Partial<Settings>): Promise<void> {
+    await settingsItem.setValue({ ...completeSettings(await settingsItem.getValue()), ...change });
   }
 
   async clearArchive(): Promise<void> {

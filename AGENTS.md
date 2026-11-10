@@ -132,8 +132,11 @@ Three layers, each with a single job. Dependencies point downward only.
   sync, and every folder after a reinstall (removing the extension clears its storage, the bookmarks stay). Folders
   made in Volet start open (the `createFolder` and `createFolderWith` commands record them so).
 - **Folders**: a collapsed folder keeps rendering its list as `folded` (`PinnedList`): rows without an open tab
-  slide away and the open ones stay in place (`hasOpenTab` in `model/pinned.ts`). Those slides are local
-  transitions on purpose, so rows added or removed for other reasons (drags, optimistic ids) just appear.
+  slide away and the open ones stay in place (`hasOpenTab` in `model/pinned.ts`), unless Volet's settings hide
+  those too ("Show open tabs in collapsed folders", `Settings.collapsedFoldersShowOpenTabs`, which the stores follow
+  as it changes; `pageEntries` follows it for the page order). Those slides are local transitions on purpose, so rows
+  added or removed for other reasons (drags, optimistic ids) just appear. Settings saved before a setting existed
+  lack it: read them through `completeSettings`.
 - **Volet switcher**: there's no limit on Volets; every tab group in Chrome is one, so a first run starts with the
   user's groups. Each one is a shutter (`SpaceDot`, a volet; the code still calls them dots): closed, a small panel in
   its color with its initial (`spaceInitial`); the active one opens into a pill with its name, its width animating

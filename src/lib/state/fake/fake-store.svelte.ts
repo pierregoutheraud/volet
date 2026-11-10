@@ -16,6 +16,7 @@ export class FakeSidebarStore implements SidebarStore {
   activeSpaceId = $state<SpaceId>('work');
   activeTabId = $state<TabId | undefined>(21);
   openFolders = $state.raw<ReadonlySet<string>>(seedOpenFolders());
+  collapsedFoldersShowOpenTabs = $state(true);
 
   #nextId = 1000;
   /** Not reactive on purpose: only read when switching Spaces. */

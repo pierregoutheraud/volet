@@ -1,6 +1,6 @@
 import { EMPTY_STATE, derive, type SidebarState } from '@/lib/engine/derive';
 import type { Command } from '@/lib/engine/protocol';
-import { openFoldersItem } from '@/lib/engine/storage';
+import { completeSettings, DEFAULT_SETTINGS, openFoldersItem, settingsItem } from '@/lib/engine/storage';
 import type { Favorite, Folder, LiveTab, SidebarStore, Space, SpaceId, SpaceItem, TabId } from '@/lib/model/types';
 import { reuseContent } from '../reuse';
 import * as tree from '../tree';
@@ -23,6 +23,8 @@ export class ChromeSidebarStore implements SidebarStore {
   activeSpaceId = $state<SpaceId>(EMPTY_STATE.activeSpaceId);
   activeTabId = $state<TabId | undefined>(EMPTY_STATE.activeTabId);
   openFolders = $state.raw<ReadonlySet<string>>(EMPTY_STATE.openFolders);
+  /** A display setting, followed from Volet's settings as they change; no reload needed. */
+  collapsedFoldersShowOpenTabs = $state(DEFAULT_SETTINGS.collapsedFoldersShowOpenTabs);
 
   readonly windowId: number;
   #gate: RefreshGate<SidebarState>;
@@ -39,6 +41,11 @@ export class ChromeSidebarStore implements SidebarStore {
 
   /** Load the initial state and start following Chrome. */
   async start(): Promise<void> {
+    const showSettings = (stored: Parameters<typeof completeSettings>[0]) => {
+      this.collapsedFoldersShowOpenTabs = completeSettings(stored).collapsedFoldersShowOpenTabs;
+    };
+    settingsItem.watch(showSettings);
+    void settingsItem.getValue().then(showSettings).catch(() => undefined);
     watchWindow(this.windowId, {
       onChange: () => this.#scheduleRefresh(),
       onTabUpdated: (tabId, change, live) => {

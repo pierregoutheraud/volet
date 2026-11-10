@@ -1,11 +1,12 @@
-import type { Page } from '@playwright/test';
+import type { Page, Worker } from '@playwright/test';
 import { command, expect, stripState, test } from './fixtures';
 
 const visiblePage = (panel: Page) => panel.locator('section:not([inert])');
 const row = (panel: Page, name: string) => visiblePage(panel).getByRole('button', { name, exact: true });
 const tabTitle = (url: string) => url.match(/<title>(\w+)/)?.[1];
 
-test('a collapsed folder still shows its open tabs', async ({ worker, windowId, panel }) => {
+/** An open folder, "Dashboard", with the pins Alpha and Beta (their tabs open) and Gamma (its tab closed). */
+async function dashboard(worker: Worker, windowId: number, panel: Page) {
   const ids = await worker.evaluate(async (id) => {
     const titles = ['Alpha', 'Beta', 'Gamma'];
     return Promise.all(
@@ -23,6 +24,10 @@ test('a collapsed folder still shows its open tabs', async ({ worker, windowId, 
   await worker.evaluate((id) => chrome.tabs.remove(id), ids[2]!);
   await expect.poll(async () => (await stripState(worker, windowId)).filter((tab) => tabTitle(tab.url)).length).toBe(2);
   await expect(row(panel, 'Gamma')).toBeVisible();
+}
+
+test('a collapsed folder still shows its open tabs', async ({ worker, windowId, panel }) => {
+  await dashboard(worker, windowId, panel);
 
   // Count Alpha's rows on every frame while the folder collapses: it stays put, never copied.
   const most = panel.evaluate(
@@ -45,6 +50,33 @@ test('a collapsed folder still shows its open tabs', async ({ worker, windowId, 
   await expect(row(panel, 'Gamma')).toHaveCount(0);
   await expect(row(panel, 'Alpha')).toBeVisible();
   await expect(row(panel, 'Beta')).toBeVisible();
+});
+
+test("Volet's settings can hide a collapsed folder's open tabs too, and the panel follows at once", async ({ context, worker, windowId, panel }) => {
+  await dashboard(worker, windowId, panel);
+  const settings = await context.newPage();
+  await settings.goto(`chrome-extension://${new URL(worker.url()).host}/options.html`);
+  const toggle = settings.getByRole('switch', { name: 'Show open tabs in collapsed folders' });
+  await expect(toggle).toBeChecked();
+  await toggle.click();
+  await expect(toggle).not.toBeChecked();
+  await expect
+    .poll(() => worker.evaluate(async () => {
+      const { settings } = (await chrome.storage.sync.get('settings')) as { settings?: { collapsedFoldersShowOpenTabs?: boolean } };
+      return settings?.collapsedFoldersShowOpenTabs;
+    }))
+    .toBe(false);
+
+  await row(panel, 'Dashboard').click();
+  await expect(row(panel, 'Dashboard')).toHaveAttribute('aria-expanded', 'false');
+  for (const name of ['Alpha', 'Beta', 'Gamma']) await expect(row(panel, name)).toHaveCount(0);
+
+  // Back on, from its label: the pins with an open tab come back in the collapsed folder.
+  await settings.getByText('Show open tabs in collapsed folders', { exact: true }).click();
+  await expect(toggle).toBeChecked();
+  await expect(row(panel, 'Alpha')).toBeVisible();
+  await expect(row(panel, 'Beta')).toBeVisible();
+  await expect(row(panel, 'Gamma')).toHaveCount(0);
 });
 
 test("double-clicking a folder doesn't rename it; its menu does", async ({ worker, windowId, panel }) => {

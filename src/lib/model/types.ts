@@ -73,6 +73,8 @@ export interface SidebarStore {
   readonly activeTabId: TabId | undefined;
   /** Folders shown open; every other folder is collapsed. */
   readonly openFolders: ReadonlySet<string>;
+  /** Whether a collapsed folder still shows its pins with an open tab (a setting, on by default). */
+  readonly collapsedFoldersShowOpenTabs: boolean;
 
   // Tabs
   activateTab(tabId: TabId): Done;

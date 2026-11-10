@@ -54,8 +54,10 @@ test('shortcut removal is the only switcher control', async ({ context, worker }
   const extensionId = new URL(worker.url()).host;
   const page = await context.newPage();
   await page.goto(`chrome-extension://${extensionId}/options.html`);
-  await expect(page.getByRole('switch')).toHaveCount(0);
-  await expect(page.getByText('Remove both shortcuts to turn the switcher off', { exact: false })).toBeVisible();
+  const preview = page.getByRole('region', { name: 'Tab switcher', exact: true });
+  // No on/off switch for the tab switcher (other settings have theirs).
+  await expect(preview.getByText('Remove both shortcuts to turn the switcher off', { exact: false })).toBeVisible();
+  await expect(preview.getByRole('switch')).toHaveCount(0);
   const manager = await context.newPage();
   await manager.goto('chrome://extensions/');
   await manager.evaluate(async (id) => {
@@ -64,7 +66,6 @@ test('shortcut removal is the only switcher control', async ({ context, worker }
     }
   }, extensionId);
   await page.reload();
-  const preview = page.getByRole('region', { name: 'Tab switcher', exact: true });
   await expect(preview.locator('dd')).toHaveText(['Not set', 'Not set']);
   expect(await worker.evaluate(() => chrome.permissions.contains({ origins: ['<all_urls>'] }))).toBe(true);
 });

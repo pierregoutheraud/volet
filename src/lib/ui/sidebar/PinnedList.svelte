@@ -3,6 +3,7 @@
   import { prefersReducedMotion } from 'svelte/motion';
   import { slide } from 'svelte/transition';
   import { type Entry, entryKey, pinsList } from '@/lib/model/dnd';
+  import { getSidebar } from '@/lib/model/context';
   import { hasOpenTab } from '@/lib/model/pinned';
   import type { PinnedNode } from '@/lib/model/types';
   import Deferred from '../primitives/Deferred.svelte';
@@ -17,7 +18,7 @@
     parentId: string;
     nodes: PinnedNode[];
     depth?: number;
-    /** Inside a collapsed folder: only the rows with an open tab stay. */
+    /** Inside a collapsed folder: only the rows with an open tab stay, or none (a setting). */
     folded?: boolean;
     /** Shown when the list is empty. */
     empty?: Snippet;
@@ -27,6 +28,7 @@
 
   let { parentId, nodes, depth = 0, folded = false, empty, class: className }: Props = $props();
 
+  const sidebar = getSidebar();
   const drag = getDrag();
   const mountQueue = hasMountQueue() ? getMountQueue() : undefined;
   const list = $derived(pinsList(parentId));
@@ -34,11 +36,14 @@
   const duration = $derived(prefersReducedMotion.current ? 0 : 160);
   const byId = $derived(new Map(nodes.map((node) => [node.id, node])));
 
-  /** Rows dragged in from elsewhere always show. */
+  /**
+   * Folded, a row stays while it has an open tab and the setting keeps those
+   * (`collapsedFoldersShowOpenTabs`). Rows dragged in from elsewhere always show.
+   */
   function shown(entry: Entry): boolean {
     if (!folded || entry.kind !== 'node') return true;
     const node = byId.get(entry.id);
-    return !node || hasOpenTab(node);
+    return !node || (sidebar.collapsedFoldersShowOpenTabs && hasOpenTab(node));
   }
 </script>
 

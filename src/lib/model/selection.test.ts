@@ -40,6 +40,11 @@ describe('pageEntries', () => {
     expect(pageEntries(space, new Set())).toEqual([node('p1'), node('docs'), node('p2'), tab(1), tab(2)]);
     expect(pageEntries(space, new Set(['docs']))).toEqual(pageEntries(space));
   });
+
+  it('shows nothing inside a collapsed folder when open tabs hide there too', () => {
+    expect(pageEntries(space, new Set(), false)).toEqual([node('p1'), node('docs'), tab(1), tab(2)]);
+    expect(pageEntries(space, new Set(['docs']), false)).toEqual(pageEntries(space));
+  });
 });
 
 describe('activeEntry', () => {

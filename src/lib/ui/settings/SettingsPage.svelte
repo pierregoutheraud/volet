@@ -4,6 +4,7 @@
   import Card from '../primitives/page/Card.svelte';
   import PageShell from '../primitives/page/PageShell.svelte';
   import Select from '../primitives/page/Select.svelte';
+  import Switch from '../primitives/page/Switch.svelte';
   import KeyboardShortcutsSettings from './KeyboardShortcutsSettings.svelte';
 
   const settings = new SettingsStore();
@@ -24,6 +25,20 @@
 <svelte:window onfocus={() => void settings.refreshShortcuts()} />
 
 <PageShell title="Settings">
+  <Card title="Sidebar">
+    <div class="flex items-center justify-between gap-3">
+      <label for="collapsed-folders-show-open-tabs" class="cursor-pointer text-[14px]">Show open tabs in collapsed folders</label>
+      <Switch
+        id="collapsed-folders-show-open-tabs"
+        checked={settings.collapsedFoldersShowOpenTabs}
+        onchange={(on) => void settings.setCollapsedFoldersShowOpenTabs(on)}
+      />
+    </div>
+    <p class="mt-1 text-[13px] leading-relaxed text-ink-muted">
+      A collapsed folder still lists its pins with an open tab, like the one you're on.
+    </p>
+  </Card>
+
   <Card title="Archiving">
     <div class="flex flex-wrap items-center gap-3 text-[14px]">
       {ARCHIVE_LABEL}

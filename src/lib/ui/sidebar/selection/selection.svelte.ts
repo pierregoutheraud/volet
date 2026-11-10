@@ -60,10 +60,10 @@ export class Selection {
   click(entry: SpaceItem, event: MouseEvent): boolean {
     const space = this.#space;
     if (!space) return false;
-    const { openFolders, activeTabId } = this.#store;
+    const { openFolders, collapsedFoldersShowOpenTabs, activeTabId } = this.#store;
     const current = activeEntry(space, activeTabId);
     if (event.shiftKey) {
-      const order = pageEntries(space, openFolders);
+      const order = pageEntries(space, openFolders, collapsedFoldersShowOpenTabs);
       const onPage = (candidate: SpaceItem | undefined) =>
         candidate && order.some((other) => entryKey(other) === entryKey(candidate)) ? candidate : undefined;
       const anchor = onPage(this.#anchor) ?? onPage(current) ?? entry;

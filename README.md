@@ -11,7 +11,7 @@ A rewrite inspired by [Arcify](https://github.com/nisargkolhe/arcify) (GPL-3.0),
   Each window shows its own Space. In Chrome's tab strip, every Space is a tab group, and the inactive ones are collapsed.
 - **Pinned tabs and folders.** Pins keep their home page: navigate away and the row shows where you are, with a button back.
   On hover, × closes the tab (the pin stays, dimmed) and the pin-off button unpins it in one click (it becomes a
-  regular tab below the divider). Folders nest; a collapsed folder still shows its open tabs.
+  regular tab below the divider). Folders nest; a collapsed folder still shows its open tabs (Settings can hide them too).
 - **Temporary tabs** sit below the divider. "Clear" closes them all. Unused ones are archived after 12 hours (configurable)
   and can be found again in search.
 - **Favorites.** The grid at the top, shared by all Spaces. Open favorites are Chrome's own pinned tabs, so anything you pin

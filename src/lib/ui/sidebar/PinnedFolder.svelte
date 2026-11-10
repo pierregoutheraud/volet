@@ -15,7 +15,7 @@
   interface Props {
     folder: Folder;
     depth?: number;
-    /** Inside a collapsed folder: the row hides, and only its pins with an open tab stay. */
+    /** Inside a collapsed folder: the row hides, and only its pins with an open tab stay (or none, a setting). */
     folded?: boolean;
     handle?: Attachment<HTMLElement>;
   }
@@ -60,7 +60,8 @@
     </ContextMenu>
   </div>
 {/if}
-<!-- Collapsed, the folder still shows its pins whose tab is open (Arc shows the tab you're on). -->
+<!-- Collapsed, the folder still shows its pins whose tab is open (Arc shows the tab you're on), unless Volet's
+     settings say to hide those too (`collapsedFoldersShowOpenTabs`). -->
 <PinnedList parentId={folder.id} nodes={folder.children} depth={depth + 1} folded={folded || !open}>
   {#snippet empty()}
     <p class="py-1.5 pl-[calc(36px+var(--depth)*16px)] text-[12px] text-ink-muted" style:--depth={depth}>

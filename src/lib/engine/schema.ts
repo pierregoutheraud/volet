@@ -21,9 +21,16 @@ export interface ArchiveEntry {
 export interface Settings {
   /** Close unpinned tabs after this many idle hours. 0 = never. */
   archiveAfterHours: number;
+  /** A collapsed folder still shows its pins with an open tab (Arc's way); off, it hides everything in it. */
+  collapsedFoldersShowOpenTabs: boolean;
 }
 
-export const DEFAULT_SETTINGS: Settings = { archiveAfterHours: 12 };
+export const DEFAULT_SETTINGS: Settings = { archiveAfterHours: 12, collapsedFoldersShowOpenTabs: true };
+
+/** Settings as stored, with a default for each one saved before it existed (or anything missing). */
+export function completeSettings(stored: Partial<Settings> | null | undefined): Settings {
+  return { ...DEFAULT_SETTINGS, ...stored };
+}
 
 export interface RootIds {
   rootId: string;
