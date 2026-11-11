@@ -1,10 +1,11 @@
 <script lang="ts">
   import type { ArcClient } from '@/lib/model/arc';
   import type { PaletteClient } from '@/lib/model/palette';
+  import type { RecentTab } from '@/lib/model/recent-tabs';
   import type { RecentTabsLauncher } from '@/lib/model/recent-tabs-launcher';
   import type { SidebarStore } from '@/lib/model/types';
-  import { colorScheme } from '@/lib/ui/primitives/color-scheme';
   import PaletteBox from '@/lib/ui/palette/PaletteBox.svelte';
+  import RecentTabCard from '@/lib/ui/recent-tabs/RecentTabCard.svelte';
   import { PaletteState } from '@/lib/ui/palette/palette-state.svelte';
   import Sidebar from '@/lib/ui/sidebar/Sidebar.svelte';
   import { FakeSearchLauncher } from '@/lib/state/fake/fake-search.svelte';
@@ -22,12 +23,13 @@
     shot: 'screenshot' | 'promo' | 'marquee';
     headline: string;
     detail: string;
-    scheme?: 'light' | 'dark';
     /** Shows Search as it opens over a page, under the headline (the capture types into it). */
     searching?: boolean;
+    /** Shows the recent tab switcher with these tabs, under the headline, the second one picked (a first press). */
+    switcherTabs?: RecentTab[];
   }
 
-  let { store, palette, arc, shot, headline, detail, scheme, searching = false }: Props = $props();
+  let { store, palette, arc, shot, headline, detail, searching = false, switcherTabs }: Props = $props();
 
   // Fixed for the page's lifetime. Search shows over the page, so the panel's own stays closed.
   // svelte-ignore state_referenced_locally
@@ -46,7 +48,8 @@
 {/snippet}
 
 {#if shot === 'screenshot'}
-  <main class="frame screenshot" style:--frame-hue={hue} data-scheme={scheme ?? 'light'}>
+  <!-- Light, like every store image. -->
+  <main class="frame screenshot" style:--frame-hue={hue}>
     <section class={['flex min-w-0 flex-1 flex-col gap-5 px-16', search ? 'pt-12' : 'justify-center']}>
       {@render wordmark(30)}
       <h1 class="text-[46px] leading-[1.05] font-semibold tracking-tight text-balance">{headline}</h1>
@@ -55,15 +58,35 @@
         <!-- Search as it shows over a page: its surface, tinted like the panel, the results cut at the frame's foot. -->
         <div
           class="palette-root mt-3 max-h-[300px] overflow-hidden rounded-[14px] bg-(--menu) font-sans text-ink [box-shadow:var(--overlay-shadow)]"
-          data-scheme={colorScheme(scheme)}
+          data-scheme="light"
           style:--space-hue={search.hue ?? hue}
         >
           <PaletteBox palette={search} onclose={() => undefined} />
         </div>
       {/if}
+      {#if switcherTabs}
+        <!-- The switcher as it shows over a page: its surface and cards, wider than the text, as the page is. -->
+        <div
+          class="recent-tabs-root -mx-10 mt-5 rounded-[14px] bg-(--menu) p-2 font-sans text-[13px]/[1.35] text-ink antialiased [box-shadow:var(--overlay-shadow)]"
+          data-scheme="light"
+          style:--space-hue={hue}
+        >
+          <div class="flex gap-0.5">
+            {#each switcherTabs as tab, index (tab.id)}
+              <RecentTabCard
+                {tab}
+                selected={index === 1}
+                onchoose={() => undefined}
+                onhighlight={() => undefined}
+                onclose={() => undefined}
+              />
+            {/each}
+          </div>
+        </div>
+      {/if}
     </section>
     <aside class="panel">
-      <Sidebar {store} search={panelSearch} {palette} {arc} {recentTabs} {scheme} />
+      <Sidebar {store} search={panelSearch} {palette} {arc} {recentTabs} scheme="light" />
     </aside>
   </main>
 {:else}
@@ -94,10 +117,6 @@
     background: linear-gradient(160deg, oklch(0.975 0.018 var(--frame-hue)), oklch(0.93 0.04 var(--frame-hue)));
   }
 
-  .screenshot[data-scheme='dark'] {
-    color: oklch(0.95 0.015 var(--frame-hue));
-    background: linear-gradient(160deg, oklch(0.27 0.03 var(--frame-hue)), oklch(0.19 0.02 var(--frame-hue)));
-  }
 
   /* Chrome's side panel: full height on the right, a hairline on its left edge. */
   .screenshot .panel {

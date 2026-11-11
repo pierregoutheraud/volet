@@ -19,7 +19,7 @@ const PAGES: SamplePage[] = [
 ];
 
 /** A page-like screenshot drawn on a canvas: a header, a heading and lines of text in the page's colors. */
-function screenshot([background, ink]: [string, string]): string {
+export function screenshot([background, ink]: [string, string]): string {
   const canvas = document.createElement('canvas');
   canvas.width = 640;
   canvas.height = 400;
