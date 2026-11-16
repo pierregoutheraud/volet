@@ -13,7 +13,7 @@
 
   /**
    * The Chrome Web Store images (`store/capture.mjs` renders this page): the real sidebar on fake data,
-   * docked on the right like Chrome's side panel, next to a headline. `promo` and `marquee` are the
+   * docked on the left like Chrome's side panel can be, next to a headline. `promo` and `marquee` are the
    * listing's promo tiles.
    */
   interface Props {
@@ -48,8 +48,11 @@
 {/snippet}
 
 {#if shot === 'screenshot'}
-  <!-- Light, like every store image. -->
+  <!-- Light, like every store image. The side panel docked on the left, as Chrome can show it. -->
   <main class="frame screenshot" style:--frame-hue={hue}>
+    <aside class="panel">
+      <Sidebar {store} search={panelSearch} {palette} {arc} {recentTabs} scheme="light" />
+    </aside>
     <section class={['flex min-w-0 flex-1 flex-col gap-5 px-16', search ? 'pt-12' : 'justify-center']}>
       {@render wordmark(30)}
       <h1 class="text-[46px] leading-[1.05] font-semibold tracking-tight text-balance">{headline}</h1>
@@ -85,9 +88,6 @@
         </div>
       {/if}
     </section>
-    <aside class="panel">
-      <Sidebar {store} search={panelSearch} {palette} {arc} {recentTabs} scheme="light" />
-    </aside>
   </main>
 {:else}
   <main class="frame brand {shot}">
@@ -118,12 +118,12 @@
   }
 
 
-  /* Chrome's side panel: full height on the right, a hairline on its left edge. */
+  /* Chrome's side panel: full height on the left, a hairline on its right edge. */
   .screenshot .panel {
     width: 336px;
     height: 100%;
     flex-shrink: 0;
-    box-shadow: -1px 0 0 oklch(0.3 0.04 var(--frame-hue) / 0.18), -18px 0 48px oklch(0.3 0.06 var(--frame-hue) / 0.12);
+    box-shadow: 1px 0 0 oklch(0.3 0.04 var(--frame-hue) / 0.18), 18px 0 48px oklch(0.3 0.06 var(--frame-hue) / 0.12);
   }
 
   .brand {
