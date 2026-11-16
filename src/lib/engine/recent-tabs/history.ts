@@ -1,6 +1,6 @@
 import { browser, type Browser } from 'wxt/browser';
 import { storage } from 'wxt/utils/storage';
-import { orderRecentTabs, type RecentTab } from '@/lib/model/recent-tabs';
+import { orderRecentTabs, RECENT_TABS_LIMIT, type RecentTab } from '@/lib/model/recent-tabs';
 import { SerialQueue } from '../retry';
 import { tabUrl } from '../snapshot';
 
@@ -16,7 +16,7 @@ async function remember(tabId: number, windowId: number, activeTabId?: number): 
   const history = await recentTabsItem.getValue();
   const recent = history[windowId] ?? [];
   const order = [tabId, ...(activeTabId === undefined ? [] : [activeTabId]), ...recent];
-  await recentTabsItem.setValue({ ...history, [windowId]: [...new Set(order)].slice(0, 5) });
+  await recentTabsItem.setValue({ ...history, [windowId]: [...new Set(order)].slice(0, RECENT_TABS_LIMIT) });
 }
 
 /** Record a visit. */

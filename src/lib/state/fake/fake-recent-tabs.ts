@@ -1,4 +1,4 @@
-import type { RecentTab, RecentTabsClient } from '@/lib/model/recent-tabs';
+import { RECENT_TABS_LIMIT, type RecentTab, type RecentTabsClient } from '@/lib/model/recent-tabs';
 
 interface SamplePage {
   title: string;
@@ -9,7 +9,7 @@ interface SamplePage {
   screenshot?: [string, string];
 }
 
-/** Five tabs for the switcher's preview page, most recent first: some with a screenshot, some without. */
+/** Tabs for the switcher's preview page, most recent first: some with a screenshot, some without, one more than it shows. */
 const PAGES: SamplePage[] = [
   { title: 'Volet: vertical tabs in Chrome', url: 'https://github.com/pierregoutheraud/volet', color: '#24292f', screenshot: ['#ffffff', '#24292f'] },
   { title: 'What are runes? • Svelte docs', url: 'https://svelte.dev/docs/svelte/what-are-runes', color: '#ff3e00', screenshot: ['#fdf6f3', '#ff3e00'] },
@@ -53,7 +53,7 @@ function favicon({ title, color }: SamplePage): string {
   return canvas.toDataURL('image/png');
 }
 
-/** The sample tabs; closing one drops it from the next gesture, choosing one does nothing. */
+/** The most recent sample tabs; closing one drops it and brings up the next, choosing one does nothing. */
 export function fakeRecentTabsClient(): RecentTabsClient {
   const tabs: RecentTab[] = PAGES.map((page, id) => ({
     id,
@@ -64,7 +64,7 @@ export function fakeRecentTabsClient(): RecentTabsClient {
   }));
   const closed = new Set<number>();
   return {
-    load: async () => tabs.filter((tab) => !closed.has(tab.id)),
+    load: async () => tabs.filter((tab) => !closed.has(tab.id)).slice(0, RECENT_TABS_LIMIT),
     activate: async () => {},
     close: async (tabId) => { closed.add(tabId); },
     settle: async () => {},

@@ -8,7 +8,7 @@ export interface RecentTab {
   preview?: string;
 }
 
-/** The tab switcher reads one frozen list per gesture and activates only on commit. */
+/** The tab switcher reads one list per gesture (read again only to fill a closed tab's place) and activates only on commit. */
 export interface RecentTabsClient {
   load(): Promise<RecentTab[]>;
   activate(tabId: number): Promise<void>;
@@ -26,6 +26,9 @@ export interface RecentTabsView {
 /** Site access, which the page script and the previews need: required in the manifest, but users can withhold it. */
 export const RECENT_TABS_PERMISSION = { origins: ['<all_urls>'] };
 
+/** How many recent tabs the switcher shows, the one in front included. */
+export const RECENT_TABS_LIMIT = 4;
+
 /** Put the active tab first, then remembered visits, then Chrome's recency fallback. */
 export function orderRecentTabs<T extends { id?: number; active: boolean; lastAccessed?: number }>(
   tabs: T[],
@@ -41,7 +44,7 @@ export function orderRecentTabs<T extends { id?: number; active: boolean; lastAc
       if (rankA !== rankB) return rankA - rankB;
       return (b.lastAccessed ?? 0) - (a.lastAccessed ?? 0);
     })
-    .slice(0, 5);
+    .slice(0, RECENT_TABS_LIMIT);
 }
 
 /** Validate preview data at the extension message boundary. */

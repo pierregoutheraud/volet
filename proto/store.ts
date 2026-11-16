@@ -56,7 +56,7 @@ const SCENES = {
   switcher: {
     shot: 'screenshot',
     headline: 'Jump back to a recent tab',
-    detail: 'Hold Ctrl and press Q to see your five most recent tabs, each with a preview. Let go to switch.',
+    detail: 'Hold Ctrl and press Q to see your four most recent tabs, each with a preview. Let go to switch.',
     hue: 205, // teal
     switching: true,
   },
@@ -73,7 +73,7 @@ const SCENES = {
 } satisfies Record<string, Scene>;
 
 /**
- * The switcher's five most recent tabs, from the sidebar's own: the one in front, then the ones used before it, one
+ * The switcher's four most recent tabs, from the sidebar's own: the one in front, then the ones used before it, one
  * of them in another Volet. Their previews are drawn in each site's colors; their icons come from where the sidebar's
  * do (the switcher only shows the icon each tab comes with).
  */
@@ -81,7 +81,6 @@ const RECENT: [TabId, [string, string]][] = [
   [21, ['#ffffff', '#1b1b1b']],
   [22, ['#ffffff', '#f48024']],
   [10, ['#f5f5f5', '#1e1e1e']],
-  [12, ['#ffffff', '#24292f']],
   [40, ['#ffffff', '#1a73e8']],
 ];
 

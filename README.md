@@ -34,10 +34,10 @@ A rewrite inspired by [Arcify](https://github.com/nisargkolhe/arcify) (GPL-3.0),
   opens over the page, and you type into it from the sidebar.
 - **Import from Arc.** Settings → Import from Arc reads Arc's `StorableSidebar.json` and brings over your Spaces, their
   colors, pinned tabs, folders and favorites. The file never leaves your computer.
-- **Recent tab switcher.** Hold <kbd>Ctrl</kbd> and press <kbd>Q</kbd> to cycle through your five most recent tabs
+- **Recent tab switcher.** Hold <kbd>Ctrl</kbd> and press <kbd>Q</kbd> to cycle through your four most recent tabs
   across Spaces in this window, like Cmd+Tab: a quick tap goes back to the tab you last used, and each further press
   goes one tab further back; let go to switch. Add <kbd>Shift</kbd> to cycle in reverse, like Cmd+Shift+Tab: it starts
-  from the far right (the oldest of the five) and moves left. Newly opened background tabs take priority, so opening a
+  from the far right (the oldest of the four) and moves left. Newly opened background tabs take priority, so opening a
   link with Cmd/Ctrl+click makes it the next selection. A centered preview highlights the selection, the arrow keys
   move it and Escape cancels. Record a close shortcut in Settings → Keyboard shortcuts to close the highlighted tab
   without switching to it, or hover a preview and use its close button (Chrome reserves Cmd+W). Remove both shortcuts

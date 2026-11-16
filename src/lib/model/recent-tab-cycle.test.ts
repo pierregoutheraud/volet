@@ -132,6 +132,38 @@ describe('recent tab cycle', () => {
     expect(activate).not.toHaveBeenCalled();
   });
 
+  it("fills a closed tab's place with the next recent tab, keeping the others in their order", async () => {
+    const window = Array.from({ length: 6 }, (_, id) => ({ id, title: `Tab ${id}`, url: '' }));
+    const load = vi.fn(async () => window.slice(0, 4));
+    const { cycle, close, onchange } = fixture(load);
+    close.mockImplementation(async (tabId) => { window.splice(window.findIndex((tab) => tab.id === tabId), 1); });
+    cycle.step();
+    cycle.closeSelected();
+    await vi.waitFor(() => expect(onchange).toHaveBeenLastCalledWith({ tabs: [0, 2, 3, 4].map((id) => window.find((tab) => tab.id === id)), selected: 1 }));
+    // The last preview closed: the highlight stays in place, on the tab that took it.
+    cycle.select(3);
+    cycle.closeSelected();
+    await vi.waitFor(() => expect(onchange.mock.lastCall?.[0]?.tabs.map((tab) => tab.id)).toEqual([0, 2, 3, 5]));
+    expect(onchange).toHaveBeenLastCalledWith(expect.objectContaining({ selected: 3 }));
+    // Nothing left to bring up: the list just gets shorter.
+    cycle.closeSelected();
+    await vi.waitFor(() => expect(onchange.mock.lastCall?.[0]?.tabs.map((tab) => tab.id)).toEqual([0, 2, 3]));
+    expect(onchange).toHaveBeenLastCalledWith(expect.objectContaining({ selected: 2 }));
+    expect(load).toHaveBeenCalledTimes(4);
+  });
+
+  it('keeps the tabs left if reading the next one fails', async () => {
+    const load = vi.fn(async () => tabs);
+    const { cycle, onchange, onerror } = fixture(load);
+    cycle.step();
+    await vi.waitFor(() => expect(onchange).toHaveBeenCalled());
+    load.mockRejectedValueOnce(new Error('Query failed'));
+    cycle.closeSelected();
+    await vi.waitFor(() => expect(onerror).toHaveBeenCalledTimes(1));
+    expect(onchange).toHaveBeenLastCalledWith({ tabs: tabs.filter((tab) => tab.id !== 1), selected: 1 });
+    expect(cycle.active).toBe(true);
+  });
+
   it('preserves a newly clicked tab when a previous close is still pending', async () => {
     let finishClose: () => void = () => {};
     const pending = new Promise<void>((resolve) => { finishClose = resolve; });

@@ -3,9 +3,9 @@ import { isRecentTab, orderRecentTabs } from './recent-tabs';
 import { recentTabModifier } from './recent-tab-shortcut';
 
 describe('recent tab order', () => {
-  it('keeps the active tab first, removes closed tabs, and limits the list to five', () => {
+  it('keeps the active tab first, removes closed tabs, and limits the list to four', () => {
     const tabs = Array.from({ length: 7 }, (_, id) => ({ id, active: id === 2, lastAccessed: id * 10 }));
-    expect(orderRecentTabs(tabs, [99, 1, 4, 2]).map((tab) => tab.id)).toEqual([2, 1, 4, 6, 5]);
+    expect(orderRecentTabs(tabs, [99, 1, 4, 2]).map((tab) => tab.id)).toEqual([2, 1, 4, 6]);
     expect(tabs.map((tab) => tab.id)).toEqual([0, 1, 2, 3, 4, 5, 6]);
   });
 

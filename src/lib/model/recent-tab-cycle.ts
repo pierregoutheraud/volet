@@ -51,7 +51,10 @@ export class RecentTabCycle {
     this.#show(this.#gesture);
   }
 
-  /** Close the highlighted tab once, then keep the next preview selected in the same order. */
+  /**
+   * Close the highlighted tab once, then keep the next preview selected in the same order. The next tab in the
+   * window's recent order takes the freed place at the end, so the list stays as long.
+   */
   closeSelected(): void {
     const gesture = this.#gesture;
     if (!gesture || gesture.closing) return;
@@ -67,8 +70,11 @@ export class RecentTabCycle {
         this.#onerror(error);
         return tabs;
       }
+      const left = tabs.filter((item) => item.id !== tab.id);
+      // Let go of meanwhile, the list only picks a tab, and the closed one's place doesn't need filling.
+      const remaining = this.#gesture === gesture ? await this.#refill(left, tab.id, tabs.length) : left;
+      // Read after refilling: the pointer may have highlighted another preview meanwhile, still in the old list.
       const highlighted = tabs[this.#index(gesture, tabs.length)];
-      const remaining = tabs.filter((item) => item.id !== tab.id);
       const nextIndex = highlighted?.id === tab.id
         ? Math.min(index, remaining.length - 1)
         : remaining.findIndex((item) => item.id === highlighted?.id);
@@ -77,6 +83,18 @@ export class RecentTabCycle {
       return remaining;
     }).finally(() => { gesture.closing = false; });
     this.#show(gesture);
+  }
+
+  /** The tabs left in their order, then the window's next recent ones, up to `length`. */
+  async #refill(left: RecentTab[], closedId: number, length: number): Promise<RecentTab[]> {
+    try {
+      const shown = new Set([closedId, ...left.map((tab) => tab.id)]);
+      const next = (await this.#client.load()).filter((tab) => !shown.has(tab.id));
+      return [...left, ...next].slice(0, length);
+    } catch (error: unknown) {
+      this.#onerror(error);
+      return left;
+    }
   }
 
   #show(gesture: CycleGesture): void {

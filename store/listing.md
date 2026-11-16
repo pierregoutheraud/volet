@@ -47,7 +47,7 @@ SEARCH PALETTE
 • Or click the search button in the sidebar: the same palette opens over the page, and you type right from the sidebar.
 
 RECENT TAB SWITCHER
-• Hold Ctrl (Control on a Mac too) and press Q to see your five most recent tabs in this window, with a preview of each, across Volets. Let go to switch: a quick tap goes back to the tab you last used, like Cmd+Tab.
+• Hold Ctrl (Control on a Mac too) and press Q to see your four most recent tabs in this window, with a preview of each, across Volets. Let go to switch: a quick tap goes back to the tab you last used, like Cmd+Tab.
 • Add Shift to go the other way. The arrow keys move the selection, Escape cancels, and you can close a tab right from the switcher.
 • Or open it from its button in the sidebar, then pick a tab with a click or the arrow keys and Enter.
 

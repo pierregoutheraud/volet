@@ -10,7 +10,7 @@
 <svelte:window onfocus={() => void settings.load()} />
 
 <p class="mt-1 text-[12px] leading-relaxed text-ink-muted">
-  Hold the modifier to pick one of your five most recent tabs, then let go to switch. Remove both shortcuts to turn the
+  Hold the modifier to pick one of your four most recent tabs, then let go to switch. Remove both shortcuts to turn the
   switcher off: it then takes no page previews.
 </p>
 {#if !settings.access}

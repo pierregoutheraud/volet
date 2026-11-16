@@ -1,6 +1,6 @@
 import { browser } from 'wxt/browser';
 
-/** At most this many screenshots, across windows: each window shows five recent tabs, and closing one brings up the next. */
+/** At most this many screenshots, across windows: each window shows four recent tabs, and closing one brings up the next. */
 const LIMIT = 10;
 const INDEX = 'recentTabPreviews';
 const imageKey = (tabId: number) => `recentTabPreview:${tabId}`;

@@ -4,11 +4,11 @@ import { recentTabsEnabled } from './enabled';
 import { PreviewStore } from './preview-store';
 
 /**
- * Previews are stored this wide: a card shows them about 140 CSS pixels across, so this stays sharp at 2x and 3x while
- * keeping each one around 20 KB (a full-resolution capture can pass 500 KB, and `storage.session` is 10 MB in all,
- * shared with the engine's own session state).
+ * Previews are stored this wide: a card shows them 240 CSS pixels across, so this stays sharp at 2x while keeping each
+ * one around 30 KB (a full-resolution capture can pass 500 KB, and `storage.session` is 10 MB in all, shared with the
+ * engine's own session state).
  */
-const PREVIEW_WIDTH = 400;
+const PREVIEW_WIDTH = 480;
 
 /** Captures the visible page a moment after a tab comes to the front, and keeps it in a `PreviewStore`. */
 export class RecentTabPreviews {

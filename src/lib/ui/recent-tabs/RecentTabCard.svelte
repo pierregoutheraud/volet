@@ -21,8 +21,8 @@
   };
 </script>
 
-<!-- 170 by 106 pixels screenshots plus the card's padding, shrinking on narrower pages (the Volet panel takes room). -->
-<div class="group relative w-[186px] min-w-30">
+<!-- 240 by 150 pixels screenshots plus the card's padding, shrinking on narrower pages (the Volet panel takes room). -->
+<div class="group relative w-[256px] min-w-30">
   <!-- Rounded like the panel's rows: hovered like a row, selected with the Volet's tint, like selected rows. -->
   <button
     class={['w-full rounded-[10px] p-2 text-left transition-colors duration-100',

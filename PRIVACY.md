@@ -33,7 +33,7 @@ clipboard.
 - **Extension storage on your device**: archived tabs (title, address, Volet name, date), which folders are open,
   the titles Volet gave to pins, the preview-only close shortcut, and the content of an imported Arc sidebar.
 - **Temporary storage**: which tab belongs to which pin and Volet, cleared when Chrome quits.
-- **Temporary tab switcher data**: the five most recently visited or opened tab ids per window, plus up to ten page
+- **Temporary tab switcher data**: the four most recently visited or opened tab ids per window, plus up to ten page
   screenshots, in Chrome's session storage, which Chrome keeps in memory. Screenshots are never synced or written to
   disk by Volet, and are cleared when Chrome quits, when Volet is updated or reloaded, or when both switcher shortcuts
   are removed. Incognito pages are not captured.

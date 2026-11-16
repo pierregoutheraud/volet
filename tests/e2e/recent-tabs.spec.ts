@@ -119,7 +119,7 @@ async function recentPage(context: BrowserContext, name: string): Promise<Page> 
   return page;
 }
 
-test('held Cmd cycles a frozen five-tab preview and commits across Volets on release', async ({ context, worker, windowId, panel }) => {
+test('held Cmd cycles a frozen four-tab preview and commits across Volets on release', async ({ context, worker, windowId, panel }) => {
   const ids = await createRecentPages(context, worker, windowId);
   const page = await recentPage(context, 'F');
   await page.bringToFront();
@@ -127,7 +127,7 @@ test('held Cmd cycles a frozen five-tab preview and commits across Volets on rel
   await step(worker, ids[5]!);
   const dialog = page.getByRole('dialog', { name: 'Recent tabs' });
   await expect(dialog).toBeVisible();
-  await expect(dialog.locator('[data-recent-tab]')).toHaveCount(5);
+  await expect(dialog.locator('[data-recent-tab]')).toHaveCount(4);
   await expect(dialog.locator('[aria-current="true"]')).toHaveAttribute('aria-label', 'Recent E');
   expect(await activeId(worker, windowId)).toBe(ids[5]);
   await step(worker, ids[5]!);
@@ -144,7 +144,7 @@ test('held Cmd cycles a frozen five-tab preview and commits across Volets on rel
   await expect(panel.getByText('Another Volet', { exact: true }).first()).toBeVisible();
 });
 
-test('previews show at 170 pixels across, whatever root font size the page sets, and shrink so all five fit on a narrower page', async ({ context, worker, windowId }) => {
+test('previews show at 240 pixels across, whatever root font size the page sets, and shrink so all four fit on a narrower page', async ({ context, worker, windowId }) => {
   const ids = await createRecentPages(context, worker, windowId);
   const page = await recentPage(context, 'F');
   await page.bringToFront();
@@ -156,10 +156,10 @@ test('previews show at 170 pixels across, whatever root font size the page sets,
     await page.setViewportSize({ width, height: 720 });
     await page.keyboard.down('Meta');
     await step(worker, ids[5]!);
-    await expect(previews).toHaveCount(5);
+    await expect(previews).toHaveCount(4);
     const boxes = await previews.evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().toJSON() as DOMRect));
     for (const box of boxes) {
-      if (width === 1280) expect([box.width, box.height]).toEqual([170, 106.25]);
+      if (width === 1280) expect([box.width, box.height]).toEqual([240, 150]);
       expect(box.width / box.height).toBeCloseTo(1.6, 1);
       expect(box.left).toBeGreaterThanOrEqual(0);
       expect(box.right).toBeLessThanOrEqual(width);
@@ -302,22 +302,22 @@ test('in reverse it starts at the far right, the oldest, then moves left, and di
   await step(worker, ids[5]!, '⌘⇧E', -1);
   const dialog = page.getByRole('dialog', { name: 'Recent tabs' });
   await expect(dialog).toBeVisible();
-  // F, E, D, C, B: next wraps from the current tab to the far right, like Cmd+Shift+Tab on a Mac.
-  await expect(dialog.locator('[aria-current="true"]')).toHaveAttribute('aria-label', 'Recent B');
+  // F, E, D, C: next wraps from the current tab to the far right, like Cmd+Shift+Tab on a Mac.
+  await expect(dialog.locator('[aria-current="true"]')).toHaveAttribute('aria-label', 'Recent C');
   await expect(dialog.getByText('Release the shortcut modifier', { exact: false })).toHaveCount(0);
   await step(worker, ids[5]!, '⌘⇧E', -1);
-  await expect(dialog.locator('[aria-current="true"]')).toHaveAttribute('aria-label', 'Recent C');
+  await expect(dialog.locator('[aria-current="true"]')).toHaveAttribute('aria-label', 'Recent D');
   await page.keyboard.up('Shift');
   expect(await activeId(worker, windowId)).toBe(ids[5]);
   // Cycling moves back right, in the same frozen order.
   await step(worker, ids[5]!);
-  await expect(dialog.locator('[aria-current="true"]')).toHaveAttribute('aria-label', 'Recent B');
+  await expect(dialog.locator('[aria-current="true"]')).toHaveAttribute('aria-label', 'Recent C');
   await page.keyboard.up('Meta');
-  await expect.poll(() => activeId(worker, windowId)).toBe(ids[1]);
+  await expect.poll(() => activeId(worker, windowId)).toBe(ids[2]);
   await expect(dialog).toHaveCount(0);
 });
 
-test('a quick tap in reverse switches to the oldest of the five, like Cmd+Shift+Tab, and cycling comes straight back', async ({ context, worker, windowId }) => {
+test('a quick tap in reverse switches to the oldest of the four, like Cmd+Shift+Tab, and cycling comes straight back', async ({ context, worker, windowId }) => {
   const ids = await createRecentPages(context, worker, windowId);
   const page = await recentPage(context, 'F');
   await page.bringToFront();
@@ -326,13 +326,13 @@ test('a quick tap in reverse switches to the oldest of the five, like Cmd+Shift+
   await step(worker, ids[5]!, '⌘⇧E', -1);
   await page.keyboard.up('Shift');
   await page.keyboard.up('Meta');
-  // F, E, D, C, B: the far right is B.
-  await expect.poll(() => activeId(worker, windowId)).toBe(ids[1]);
+  // F, E, D, C: the far right is C.
+  await expect.poll(() => activeId(worker, windowId)).toBe(ids[2]);
   await expect(page.getByRole('dialog', { name: 'Recent tabs' })).toHaveCount(0);
-  const oldest = await recentPage(context, 'B');
+  const oldest = await recentPage(context, 'C');
   await oldest.keyboard.down('Meta');
   await oldest.keyboard.up('Meta');
-  await step(worker, ids[1]!);
+  await step(worker, ids[2]!);
   await expect.poll(() => activeId(worker, windowId)).toBe(ids[5]);
 });
 
@@ -370,15 +370,18 @@ test('only the configured close shortcut removes highlighted tabs and live rebin
   await page.keyboard.press('Backspace');
   await expect.poll(async () => (await stripState(worker, windowId)).some((tab) => tab.id === ids[4])).toBe(false);
   expect(await activeId(worker, windowId)).toBe(ids[5]);
-  await expect(dialog.locator('[data-recent-tab]')).toHaveCount(4);
+  // The next recent tab takes the closed one's place, at the end, without closing and opening the switcher again.
+  const cards = dialog.locator('[data-recent-tab]');
+  await expect(cards).toHaveText(['Recent F', 'Recent D', 'Recent C', 'Recent B']);
   await expect(dialog.locator('[aria-current="true"]')).toHaveAttribute('aria-label', 'Recent D');
   // Delete is a different key and has no implicit close binding.
   await page.keyboard.press('Delete');
-  await expect(dialog.locator('[data-recent-tab]')).toHaveCount(4);
+  await expect(cards).toHaveCount(4);
   await worker.evaluate(() => chrome.storage.local.set({ previewCloseShortcut: 'Cmd+Delete' }));
   await page.keyboard.press('Delete');
   await expect.poll(async () => (await stripState(worker, windowId)).some((tab) => tab.id === ids[3])).toBe(false);
   expect(await activeId(worker, windowId)).toBe(ids[5]);
+  await expect(cards).toHaveText(['Recent F', 'Recent C', 'Recent B', 'Recent A']);
   await expect(dialog.locator('[aria-current="true"]')).toHaveAttribute('aria-label', 'Recent C');
   await page.keyboard.up('Meta');
   await expect.poll(() => activeId(worker, windowId)).toBe(ids[2]);
@@ -464,7 +467,7 @@ test('several new background tabs are newest first and preserve the original pag
   await expect.poll(() => activeId(worker, windowId)).toBe(ids[5]);
   // Closing the newest tab exposes the next newest background tab, rather than stale history.
   await worker.evaluate((id) => chrome.tabs.remove(id), created[5]!);
-  // And it leaves the window's history, where it would take one of the five slots.
+  // And it leaves the window's history, where it would take one of the four slots.
   await expect.poll(() => worker.evaluate(async ({ windowId, id }) => {
     const { recentTabs } = await chrome.storage.session.get('recentTabs');
     return ((recentTabs as Record<string, number[]> | undefined)?.[windowId] ?? []).includes(id);
@@ -521,17 +524,17 @@ test.describe('custom reverse shortcut', () => {
     await page.keyboard.press(process.platform === 'darwin' ? 'E' : 'Q');
     const dialog = page.getByRole('dialog', { name: 'Recent tabs' });
     await expect(dialog).toHaveCount(0);
-    // F, E, D, C, B: in reverse from the far right, moving left.
-    await step(worker, ids[5]!, reverse, -1);
-    await expect(dialog.locator('[aria-current="true"]')).toHaveAttribute('aria-label', 'Recent B');
+    // F, E, D, C: in reverse from the far right, moving left.
     await step(worker, ids[5]!, reverse, -1);
     await expect(dialog.locator('[aria-current="true"]')).toHaveAttribute('aria-label', 'Recent C');
     await step(worker, ids[5]!, reverse, -1);
     await expect(dialog.locator('[aria-current="true"]')).toHaveAttribute('aria-label', 'Recent D');
+    await step(worker, ids[5]!, reverse, -1);
+    await expect(dialog.locator('[aria-current="true"]')).toHaveAttribute('aria-label', 'Recent E');
     await page.keyboard.up('Shift');
     expect(await activeId(worker, windowId)).toBe(ids[5]);
     await page.keyboard.up(modifier);
-    await expect.poll(() => activeId(worker, windowId)).toBe(ids[3]);
+    await expect.poll(() => activeId(worker, windowId)).toBe(ids[4]);
   });
 
   test('late commands switch at once: cycling toggles the last two tabs, in reverse it goes to the oldest, also with two or one tabs', async ({ context, worker, windowId }) => {
@@ -539,12 +542,12 @@ test.describe('custom reverse shortcut', () => {
     const commands = await worker.evaluate(() => chrome.commands.getAll());
     const reverse = commands.find((command) => command.name === 'cycle-recent-tabs-reverse')!.shortcut!;
     const cycle = commands.find((command) => command.name === 'cycle-recent-tabs')!.shortcut!;
-    // F, E, D, C, B: cycling toggles F and E, in reverse it goes to the far right (B), and cycling from B returns to F.
+    // F, E, D, C: cycling toggles F and E, in reverse it goes to the far right (C), and cycling from C returns to F.
     const gestures: { from: string; shortcut: string; offset: 1 | -1; to: number }[] = [
       { from: 'F', shortcut: cycle, offset: 1, to: ids[4]! },
       { from: 'E', shortcut: cycle, offset: 1, to: ids[5]! },
-      { from: 'F', shortcut: reverse, offset: -1, to: ids[1]! },
-      { from: 'B', shortcut: cycle, offset: 1, to: ids[5]! },
+      { from: 'F', shortcut: reverse, offset: -1, to: ids[2]! },
+      { from: 'C', shortcut: cycle, offset: 1, to: ids[5]! },
     ];
     let currentId = ids[5]!;
     for (const gesture of gestures) {
@@ -721,7 +724,7 @@ test('with the Volet panel focused, the held modifier shows the previews, panel 
   await panel.bringToFront();
   await panel.keyboard.down('Meta');
   await step(worker, ids[5]!);
-  await expect(dialog.locator('[data-recent-tab]')).toHaveCount(5);
+  await expect(dialog.locator('[data-recent-tab]')).toHaveCount(4);
   await expect(selected).toHaveAttribute('aria-label', 'Recent E');
   await step(worker, ids[5]!);
   await expect(selected).toHaveAttribute('aria-label', 'Recent D');
@@ -769,7 +772,7 @@ test("the panel's Recent tabs button opens the switcher until a tab is picked, t
   await panel.bringToFront();
   await button.click();
   await expect(button).toHaveAttribute('aria-pressed', 'true');
-  await expect(dialog.locator('[data-recent-tab]')).toHaveCount(5);
+  await expect(dialog.locator('[data-recent-tab]')).toHaveCount(4);
   await expect(selected).toHaveAttribute('aria-label', 'Recent E');
   // No modifier to let go of: it stays open while the panel's keys drive it, and Enter switches.
   await panel.keyboard.press('ArrowRight');
@@ -785,7 +788,7 @@ test("the panel's Recent tabs button opens the switcher until a tab is picked, t
   const open = async () => {
     await button.click();
     await expect(button).toHaveAttribute('aria-pressed', 'true');
-    await expect(switched.locator('[data-recent-tab]')).toHaveCount(5);
+    await expect(switched.locator('[data-recent-tab]')).toHaveCount(4);
   };
   await open();
   await button.click();
@@ -890,9 +893,9 @@ test('screenshots are kept small, and open pages get the page script once per se
   let preview: string | undefined;
   await expect.poll(async () => (preview = (await queryFrom(worker, current)).find((tab) => tab.id === current)?.preview),
     { timeout: 10_000 }).toMatch(/^data:image\/jpeg;base64,/);
-  // Captured at the window's full size (1280 pixels here), kept 400 across: enough for a card, a few kilobytes each.
+  // Captured at the window's full size (1280 pixels here), kept 480 across: enough for a card, a few kilobytes each.
   const width = await worker.evaluate(async (image) => (await createImageBitmap(await (await fetch(image)).blob())).width, preview!);
-  expect(width).toBe(400);
+  expect(width).toBe(480);
   expect(preview!.length).toBeLessThan(60_000);
   // A worker Chrome merely woke up again finds this set, and leaves the open pages alone.
   expect(await worker.evaluate(async () => (await chrome.storage.session.get('recentTabsAttached')).recentTabsAttached)).toBe(true);
