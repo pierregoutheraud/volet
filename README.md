@@ -4,6 +4,8 @@ Arc-like vertical tab Spaces for Chrome, as a side panel extension. A *volet* is
 A rewrite inspired by [Arcify](https://github.com/nisargkolhe/arcify) (GPL-3.0), built with
 [WXT](https://wxt.dev), Svelte 5, TypeScript, Tailwind v4, Bits UI and dnd-kit.
 
+**[Get Volet on the Chrome Web Store](https://chromewebstore.google.com/detail/volet/jmdpahbekiokaiailpchobodmfkcjipg)**
+
 ## What it does
 
 - **Spaces.** Each Space has its own pinned and temporary tabs, and tints the whole sidebar in its color.
@@ -79,7 +81,9 @@ the preview is open.
 
 ## Install
 
-From the Chrome Web Store (coming soon), or build it yourself:
+Install it from the [Chrome Web Store](https://chromewebstore.google.com/detail/volet/jmdpahbekiokaiailpchobodmfkcjipg).
+
+Or build it yourself:
 
 ```bash
 pnpm install
