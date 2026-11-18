@@ -37,7 +37,9 @@
           {#if tab.muted}<VolumeX size={14} />{:else}<Volume2 size={14} />{/if}
         </IconButton>
       {/if}
-      <IconButton label="Close tab" reveal onclick={() => sidebar.closeTab(tab.id)}>
+      <!-- While the tab plays sound, its sound button keeps to the row's edge until the row is hovered
+           (the title leaves room for one button then: `buttons.shown`). -->
+      <IconButton label="Close tab" reveal collapse={tab.audible} onclick={() => sidebar.closeTab(tab.id)}>
         <X size={14} strokeWidth={2.25} />
       </IconButton>
     {/snippet}
