@@ -70,7 +70,7 @@ KEYBOARD SHORTCUTS
 
 GOOD TO KNOW
 • Chrome's own tab strip stays at the top; Volet keeps it tidy by collapsing the other Volets' groups.
-• Chrome decides the side panel's width and side.
+• Chrome sets the side panel's width. To put Volet on the left: Chrome's settings, Appearance, Side panel position.
 
 Volet is free and open source (GPL-3.0): https://github.com/pierregoutheraud/volet
 ```

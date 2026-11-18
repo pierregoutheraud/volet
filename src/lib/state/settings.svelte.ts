@@ -1,7 +1,7 @@
 import { browser } from 'wxt/browser';
 import { DEFAULT_SETTINGS, archiveItem, completeSettings, settingsItem, type Settings } from '@/lib/engine/storage';
 import { KEYBOARD_SHORTCUT_GROUPS, type KeyboardShortcut } from '@/lib/model/keyboard-shortcuts';
-import { defaultShortcutKeys } from '@/lib/model/shortcut-display';
+import { editShortcuts, readShortcuts } from './shortcuts';
 
 /**
  * The shortcuts the manifest declares, listed in this order (Chrome returns them in no particular one). Chrome also
@@ -32,17 +32,7 @@ export class SettingsStore {
 
   /** Refresh bindings after returning from Chrome's shortcut editor. */
   async refreshShortcuts(): Promise<void> {
-    const [commands, platform] = await Promise.all([browser.commands.getAll(), browser.runtime.getPlatformInfo()]);
-    const defaults = browser.runtime.getManifest().commands;
-    this.shortcuts = commands
-      .filter((command) => SHORTCUT_ORDER.includes(command.name ?? ''))
-      .map((command) => ({
-        name: command.name ?? '',
-        description: command.description ?? '',
-        keys: command.shortcut ?? '',
-        defaultKeys: defaultShortcutKeys(defaults?.[command.name ?? '']?.suggested_key, platform.os),
-      }))
-      .sort((a, b) => SHORTCUT_ORDER.indexOf(a.name) - SHORTCUT_ORDER.indexOf(b.name));
+    this.shortcuts = await readShortcuts(SHORTCUT_ORDER);
   }
 
   async setArchiveAfter(hours: number): Promise<void> {
@@ -72,10 +62,15 @@ export class SettingsStore {
 
   /** Chrome's own page for assigning extension shortcuts. */
   async editShortcuts(): Promise<void> {
-    await browser.tabs.create({ url: 'chrome://extensions/shortcuts' });
+    await editShortcuts();
   }
 
   async openImport(): Promise<void> {
     await browser.tabs.create({ url: browser.runtime.getURL('/import.html') });
+  }
+
+  /** The welcome page: the setup checklist and the basics, as shown after install. */
+  async openWelcome(): Promise<void> {
+    await browser.tabs.create({ url: browser.runtime.getURL('/welcome.html') });
   }
 }

@@ -50,6 +50,8 @@ export const lastPagesItem = storage.defineItem<Record<string, string>>('local:l
 export const importedArcSpacesItem = storage.defineItem<string[]>('local:importedArcSpaces', { fallback: [] });
 /** Show the "Coming from Arc?" card: set on install, cleared when dismissed or once something is imported. */
 export const arcInviteItem = storage.defineItem<boolean>('local:arcInvite', { fallback: false });
+/** The welcome page's "Keep it on the right": the panel's side is settled even though it isn't on the left. */
+export const panelSideKeptItem = storage.defineItem<boolean>('local:panelSideKept', { fallback: false });
 
 // Sync: follows the user across devices. Keyed by Space name since bookmark ids differ per device.
 export const spaceMetaItem = storage.defineItem<Record<string, SpaceMeta>>('sync:spaceMeta', { fallback: {} });

@@ -5,7 +5,8 @@ Volet: Arc-like vertical tab Spaces for Chrome, a side panel extension built wit
 ## Commands
 
 ```bash
-pnpm proto          # sidebar UI as a plain web page on fake data (fast visual iteration); /recent-tabs.html: the tab switcher
+pnpm proto          # sidebar UI as a plain web page on fake data (fast visual iteration); /recent-tabs.html: the tab
+                    # switcher; /welcome.html: the welcome page
 pnpm dev            # extension dev mode: launches a fresh Chrome profile, live reload
 pnpm dev:own        # same, without launching Chrome (load output/chrome-mv3-dev in your own profile)
 pnpm build          # production build in output/chrome-mv3
@@ -85,8 +86,18 @@ Three layers, each with a single job. Dependencies point downward only.
 - **Pure logic is kept pure** (`derive.ts`, `snapshot.ts`, `colors.ts`, importers, search ranking) so it can be unit tested without Chrome.
 - **Entry points** (`src/entrypoints/`): `background.ts` (the engine), `sidepanel/` (the sidebar), `palette.ts`
   (Search, unlisted, added by the worker to the current page's top frame and rendered in a shadow root: see Search
-  below), `copy-url.ts` (the copy shortcut's page side: see below), `options/` (settings) and `import/` (Arc
-  import).
+  below), `copy-url.ts` (the copy shortcut's page side: see below), `options/` (settings), `import/` (Arc import) and
+  `welcome/` (see below).
+- **Welcome page** (`entrypoints/welcome/`, `ui/welcome/`, `model/welcome.ts`): opened in a new tab after a first
+  install only (`onInstalled`, `reason === 'install'`; never on updates), as the panel can't open itself; Settings
+  opens it again (Getting started). A live checklist (`setupSteps`, pure) reads Chrome, and reads it again when the
+  page comes back to the front: the panel shown in any window (`openPanelsItem`, or its own Open Volet button, which
+  calls `sidePanel.open` in the click with the window id read ahead), its side (`sidePanel.getLayout`, Chrome 140;
+  either side counts once the user keeps the right, `panelSideKeptItem`) and the pinned icon
+  (`action.getUserSettings`). Chrome lets no extension move its panel, so the side step opens Chrome's settings
+  searched for the option (`?search=Side+panel+position`). Its "Coming from Arc?" card reads `arcInviteItem`, like the sidebar's: dismissing either clears both.
+  The page takes a `WelcomeClient` (`state/welcome.svelte.ts`; `pnpm proto`'s `/welcome.html` has a fake one). The
+  e2e build doesn't open it on install: every test installs anew, and the tab would show in every strip they check.
 - **Copy the current tab's link** (`copy-url`, unassigned: Chrome's four suggestions are taken): the worker can't write
   the clipboard and Volet asks for no clipboard permission, so whatever has the keyboard writes it
   (`engine/copy-url.ts`): the window's panel when it has it (`answerCopyRequests`, like `panelHasFocus`), else the page,

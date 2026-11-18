@@ -5,17 +5,19 @@
   interface Props {
     title: string;
     intro?: string;
+    /** Forces a color scheme (the prototype's `?theme=`); otherwise the system's. */
+    scheme?: 'light' | 'dark';
     children: Snippet;
   }
 
-  let { title, intro, children }: Props = $props();
+  let { title, intro, scheme, children }: Props = $props();
 </script>
 
 <!-- A full-page layout for the extension's own pages, in the sidebar's tint (the default violet: pages aren't tied to a
      Space). -->
 <div
   class="page-root min-h-screen bg-[linear-gradient(170deg,var(--wash-top),var(--wash-bottom))] text-ink [--space-hue:268]"
-  data-scheme={colorScheme()}
+  data-scheme={colorScheme(scheme)}
 >
   <main class="mx-auto flex max-w-[640px] flex-col gap-5 px-4 py-12">
     <header>

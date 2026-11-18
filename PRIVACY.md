@@ -1,6 +1,6 @@
 # Volet privacy policy
 
-Effective November 7, 2026.
+Effective November 18, 2026.
 
 Volet is a Chrome extension that shows your tabs in Chrome's side panel and sorts them into workspaces (Volets).
 It runs entirely inside your browser. It has no server, no account, no analytics and no ads, and it never sends
@@ -18,6 +18,8 @@ To do its job, Volet reads, on your device only:
   after you visit a tab, as a small image. Previews are used only in the centered tab switcher, which websites can't
   read. To notice the switcher shortcut's modifier being let go, Volet also listens for keys on websites, including in
   their frames; it only notes whether that modifier is held, and the switcher's own keys while it is open.
+- **How Chrome shows Volet, on its welcome page**: which side the side panel is on and whether Volet's icon is pinned
+  to the toolbar, to show which setup steps are left.
 - **An Arc sidebar file, only if you pick one** on the "Import from Arc" page. Volet reads it in the browser to
   import your Arc Spaces, and the file never leaves your computer.
 
@@ -31,7 +33,8 @@ clipboard.
 
 - **Bookmarks** (the "Volet" folder): your Volets, pins, folders and favorites.
 - **Extension storage on your device**: archived tabs (title, address, Volet name, date), which folders are open,
-  the titles Volet gave to pins, the preview-only close shortcut, and the content of an imported Arc sidebar.
+  the titles Volet gave to pins, the preview-only close shortcut, the content of an imported Arc sidebar, and whether
+  you chose to keep the side panel on the right.
 - **Temporary storage**: which tab belongs to which pin and Volet, cleared when Chrome quits.
 - **Temporary tab switcher data**: the four most recently visited or opened tab ids per window, plus up to ten page
   screenshots, in Chrome's session storage, which Chrome keeps in memory. Screenshots are never synced or written to

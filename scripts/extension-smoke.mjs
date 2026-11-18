@@ -2,7 +2,7 @@ import { expect } from '@playwright/test';
 
 /** Exercise extension pages and preview messages without changing the application's engine or queue. */
 export async function smokeExtensionPages(context, worker, origin) {
-  for (const name of ['options', 'import']) {
+  for (const name of ['options', 'import', 'welcome']) {
     const page = await context.newPage();
     await page.goto(`${origin}/${name}.html`);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();

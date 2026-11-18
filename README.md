@@ -69,7 +69,8 @@ the preview is open.
 
 - Chrome's own tab strip stays at the top. Spaces keep it tidy by collapsing other Spaces' groups; Chrome's built-in
   vertical tabs can replace it if you prefer.
-- The side panel's width and side are set by Chrome.
+- Chrome sets the side panel's width. Its side is a Chrome setting too: to put Volet on the left, open Chrome's
+  settings, Appearance, and set Side panel position to Left.
 - The palette can't appear on Chrome's own pages (`chrome://`, the new tab page, the Web Store); there it opens in the
   sidebar instead. So it does from the sidebar's search button when Volet's website access is withheld.
 - Copying the current tab's link does nothing on Chrome's own pages or with the keyboard in the address bar (Volet
@@ -91,6 +92,9 @@ pnpm build
 ```
 
 Then open `chrome://extensions`, enable Developer mode, click "Load unpacked" and pick `output/chrome-mv3`.
+
+A first install opens a welcome page: open the sidebar, choose its side, pin the icon, and the basics. Find it again
+in Settings → Getting started.
 
 ## Development
 

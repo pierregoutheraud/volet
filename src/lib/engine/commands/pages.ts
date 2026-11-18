@@ -11,3 +11,8 @@ export const pageHandlers = {
     await browser.tabs.create({ url: browser.runtime.getURL('/import.html') });
   },
 } satisfies Partial<Handlers>;
+
+/** The welcome page (setup checklist and the basics), opened in a new tab after a first install. */
+export async function openWelcome(): Promise<void> {
+  await browser.tabs.create({ url: browser.runtime.getURL('/welcome.html') });
+}

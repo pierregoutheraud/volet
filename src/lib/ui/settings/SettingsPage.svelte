@@ -25,6 +25,13 @@
 <svelte:window onfocus={() => void settings.refreshShortcuts()} />
 
 <PageShell title="Settings">
+  <Card title="Getting started">
+    <div class="flex items-center justify-between gap-3">
+      <p class="text-[14px]">Set up the side panel and learn the basics, as after installing Volet.</p>
+      <Button onclick={() => void settings.openWelcome()}>Open the welcome page</Button>
+    </div>
+  </Card>
+
   <Card title="Sidebar">
     <div class="flex items-center justify-between gap-3">
       <label for="collapsed-folders-show-open-tabs" class="cursor-pointer text-[14px]">Show open tabs in collapsed folders</label>
