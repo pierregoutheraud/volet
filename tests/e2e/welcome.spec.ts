@@ -22,13 +22,13 @@ function sidePanelCount(worker: Worker) {
 test('the checklist opens the side panel from the page', async ({ context, worker }) => {
   const page = await context.newPage();
   await openWelcome(page, worker);
-  await expect(page.getByText('0 of 3')).toBeVisible();
+  await expect(page.getByText('0 of 2')).toBeVisible();
   await expect(step(page, 'Open Volet')).toHaveAttribute('data-step', 'todo');
 
   await page.getByRole('button', { name: 'Open Volet' }).click();
   await expect.poll(() => sidePanelCount(worker)).toBe(1);
   await expect(step(page, 'Open Volet')).toHaveAttribute('data-step', 'done');
-  await expect(page.getByText('1 of 3')).toBeVisible();
+  await expect(page.getByText('1 of 2')).toBeVisible();
 });
 
 test('the side step follows Chrome, and keeping the panel on the right settles it for good', async ({
@@ -60,17 +60,44 @@ test("the side step's settings button opens Chrome's settings, searched for the 
   await opened;
 });
 
-test('the Arc card shares its flag with the sidebar', async ({ context, worker, panel }) => {
+test("the optional Arc step shares its flag with the sidebar's card", async ({ context, worker, panel }) => {
   // A first install sets the flag, so the panel shows its card too.
   await expect(panel.getByRole('complementary', { name: 'Coming from Arc?' })).toBeVisible();
   const page = await context.newPage();
   await openWelcome(page, worker);
-  await expect(page.getByRole('heading', { name: 'Coming from Arc?' })).toBeVisible();
+  const arc = step(page, 'Bring your Arc Spaces');
+  await expect(arc).toHaveAttribute('data-step', 'todo');
+  await expect(arc).toContainText('Optional');
+  // Optional: not one of the steps counted.
+  await expect(page.getByText('0 of 2')).toBeVisible();
 
-  await page.getByRole('button', { name: 'Dismiss' }).click();
-  await expect(page.getByRole('heading', { name: 'Coming from Arc?' })).toBeHidden();
+  await page.getByRole('button', { name: 'Not using Arc' }).click();
+  await expect(arc).toHaveAttribute('data-step', 'skipped');
+  await expect(arc).toContainText('Skipped');
   await expect(panel.getByRole('complementary', { name: 'Coming from Arc?' })).toBeHidden();
   expect(await worker.evaluate(async () => (await chrome.storage.local.get('arcInvite')).arcInvite)).toBe(false);
+});
+
+test('the Arc step is done once Arc Spaces came in', async ({ context, worker }) => {
+  const page = await context.newPage();
+  await openWelcome(page, worker);
+  const arc = step(page, 'Bring your Arc Spaces');
+  await expect(arc).toHaveAttribute('data-step', 'todo');
+
+  // What the import command records once it has brought Spaces in (`commands/import.ts`).
+  await worker.evaluate(() => chrome.storage.local.set({ importedArcSpaces: ['arc-space'], arcInvite: false }));
+  await expect(arc).toHaveAttribute('data-step', 'done');
+  await expect(arc).toContainText('Imported');
+  await expect(page.getByText('0 of 2')).toBeVisible();
+});
+
+test("the welcome page opens Volet's settings", async ({ context, worker }) => {
+  const page = await context.newPage();
+  await openWelcome(page, worker);
+  const opened = context.waitForEvent('page', (next) => next.url().endsWith('/options.html'));
+  await page.getByRole('button', { name: 'Open settings', exact: true }).click();
+  const settings = await opened;
+  await expect(settings.getByRole('heading', { name: 'Settings', level: 1 })).toBeVisible();
 });
 
 test('settings open the welcome page again', async ({ context, worker }) => {

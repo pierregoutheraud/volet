@@ -1,4 +1,5 @@
 import type { KeyboardShortcut } from './keyboard-shortcuts';
+import { normalizeShortcutKeys } from './shortcut-display';
 
 /** Where Chrome shows side panels (Settings, Appearance, Side panel position). */
 export type PanelSide = 'left' | 'right';
@@ -13,13 +14,21 @@ export interface SetupState {
   readonly sideKept: boolean;
   /** Volet's icon is pinned to Chrome's toolbar. */
   readonly onToolbar: boolean;
+  /** The Arc import is still offered (`arcInviteItem`, shared with the sidebar's "Coming from Arc?" card). */
+  readonly arcInvite: boolean;
+  /** Arc Spaces have come in on this device (`importedArcSpacesItem`). */
+  readonly arcImported: boolean;
 }
 
-export type SetupStepId = 'open' | 'side' | 'pin';
+export type SetupStepId = 'open' | 'side' | 'pin' | 'arc';
 
 export interface SetupStep {
   id: SetupStepId;
   done: boolean;
+  /** Not needed to be set up (the pinned icon, the Arc import): left out of the progress. */
+  optional?: true;
+  /** An optional step set aside without doing it. */
+  skipped?: boolean;
 }
 
 /** The checklist's steps, in page order. Pure. */
@@ -27,47 +36,48 @@ export function setupSteps(state: SetupState): SetupStep[] {
   return [
     { id: 'open', done: state.panelSeen },
     { id: 'side', done: state.side === 'left' || state.sideKept },
-    { id: 'pin', done: state.onToolbar },
+    // Ctrl+B opens Volet as well: the icon is a convenience.
+    { id: 'pin', done: state.onToolbar, optional: true },
+    { id: 'arc', done: state.arcImported, optional: true, skipped: !state.arcImported && !state.arcInvite },
   ];
 }
 
-/** How far along the checklist is. */
+/** How far along the checklist is, counting the steps it needs (not the optional ones). */
 export function setupProgress(steps: readonly SetupStep[]): { done: number; total: number; allDone: boolean } {
-  const done = steps.filter((step) => step.done).length;
-  return { done, total: steps.length, allDone: done === steps.length };
+  const needed = steps.filter((step) => !step.optional);
+  const done = needed.filter((step) => step.done).length;
+  return { done, total: needed.length, allDone: done === needed.length };
 }
 
-/** The shortcuts the welcome page lists, in its order: the sidebar, Search, the tab switcher. */
-export const WELCOME_SHORTCUTS = ['toggle-sidebar', 'open-palette', 'cycle-recent-tabs'];
+/** The shortcuts the welcome page shows, in its order, by the short name it gives each. */
+const WELCOME_SHORTCUT_LABELS: Record<string, string> = {
+  'toggle-sidebar': 'Sidebar',
+  'open-palette': 'Search',
+  'cycle-recent-tabs': 'Recent tabs',
+};
+export const WELCOME_SHORTCUTS = Object.keys(WELCOME_SHORTCUT_LABELS);
 
-/** "12 hours", "a day", "3 days", "a week": how long an unused tab stays open. Empty when tabs are never closed. */
-export function archiveDelayText(hours: number): string {
-  if (hours <= 0) return '';
-  if (hours === 168) return 'a week';
-  if (hours % 24 === 0) return hours === 24 ? 'a day' : `${hours / 24} days`;
-  return hours === 1 ? 'an hour' : `${hours} hours`;
+/** The welcome page's row of shortcuts: the assigned ones, in its order, with their short names. Pure. */
+export function welcomeShortcuts(shortcuts: readonly KeyboardShortcut[]): { label: string; keys: string }[] {
+  return WELCOME_SHORTCUTS.flatMap((name) => {
+    const keys = normalizeShortcutKeys(shortcuts.find((shortcut) => shortcut.name === name)?.keys ?? '');
+    return keys ? [{ label: WELCOME_SHORTCUT_LABELS[name]!, keys }] : [];
+  });
 }
 
-/**
- * The welcome page's link to Chrome: the checklist's live state, the shortcuts and settings it mentions, and the
- * "Coming from Arc?" card (`arcInviteItem`, shared with the sidebar's card).
- */
+/** The welcome page's link to Chrome: the checklist's live state, and the shortcuts it shows. */
 export interface WelcomeClient extends SetupState {
   /** The `WELCOME_SHORTCUTS`, as Chrome has them assigned. */
   readonly shortcuts: readonly KeyboardShortcut[];
-  /** Settings' "Close unpinned tabs I haven't used for" (0: never). */
-  readonly archiveAfterHours: number;
-  /** Show the "Coming from Arc?" card. */
-  readonly arcInvite: boolean;
   /** Open the side panel in the page's window. Call it from the click itself: Chrome needs the gesture. */
   openPanel(): void;
   /** Chrome's settings, searched for Side panel position. */
   openSideSettings(): void;
   /** Keep the panel on its side (the right): the step is done. */
   keepSide(): void;
-  editShortcuts(): void;
   openSettings(): void;
   openImport(): void;
+  /** Skip the Arc step: the sidebar's "Coming from Arc?" card goes too. */
   dismissArc(): void;
   /** Read again what may have changed in Chrome's own pages (the page calls it when it comes back to the front). */
   refresh(): Promise<void>;

@@ -1,9 +1,10 @@
 <script lang="ts">
+  import { Settings } from '@lucide/svelte';
   import type { WelcomeClient } from '@/lib/model/welcome';
+  import Button from '../primitives/page/Button.svelte';
   import PageShell from '../primitives/page/PageShell.svelte';
-  import GoodToKnow from './GoodToKnow.svelte';
   import SetupChecklist from './SetupChecklist.svelte';
-  import WelcomeArc from './WelcomeArc.svelte';
+  import WelcomeShortcuts from './WelcomeShortcuts.svelte';
 
   let { client, scheme }: { client: WelcomeClient; scheme?: 'light' | 'dark' } = $props();
 </script>
@@ -18,6 +19,15 @@
   {scheme}
 >
   <SetupChecklist {client} />
-  <GoodToKnow {client} />
-  <WelcomeArc {client} />
+  <footer class="flex flex-wrap items-center justify-between gap-3 px-1">
+    <WelcomeShortcuts {client} />
+    <div class="ml-auto">
+      <Button onclick={() => client.openSettings()}>
+        <span class="inline-flex items-center gap-1.5">
+          <Settings size={15} strokeWidth={2} aria-hidden="true" />
+          Open settings
+        </span>
+      </Button>
+    </div>
+  </footer>
 </PageShell>

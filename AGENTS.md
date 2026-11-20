@@ -90,12 +90,15 @@ Three layers, each with a single job. Dependencies point downward only.
   `welcome/` (see below).
 - **Welcome page** (`entrypoints/welcome/`, `ui/welcome/`, `model/welcome.ts`): opened in a new tab after a first
   install only (`onInstalled`, `reason === 'install'`; never on updates), as the panel can't open itself; Settings
-  opens it again (Getting started). A live checklist (`setupSteps`, pure) reads Chrome, and reads it again when the
-  page comes back to the front: the panel shown in any window (`openPanelsItem`, or its own Open Volet button, which
-  calls `sidePanel.open` in the click with the window id read ahead), its side (`sidePanel.getLayout`, Chrome 140;
-  either side counts once the user keeps the right, `panelSideKeptItem`) and the pinned icon
-  (`action.getUserSettings`). Chrome lets no extension move its panel, so the side step opens Chrome's settings
-  searched for the option (`?search=Side+panel+position`). Its "Coming from Arc?" card reads `arcInviteItem`, like the sidebar's: dismissing either clears both.
+  opens it again (Getting started), and its footer opens Settings, next to the main shortcuts. A live checklist
+  (`setupSteps`, pure) reads Chrome, and reads it again when the page comes back to the front: the panel shown in any
+  window (`openPanelsItem`, or its own Open Volet button, which calls `sidePanel.open` in the click with the window id
+  read ahead), its side (`sidePanel.getLayout`, Chrome 140; either side counts once the user keeps the right,
+  `panelSideKeptItem`) and the pinned icon (`action.getUserSettings`). Chrome lets no extension move its panel, so the
+  side step opens Chrome's settings searched for the option (`?search=Side+panel+position`). Its last two steps are
+  optional (`SetupStep.optional`, left out of the count): pinning the icon, and the Arc import, offered while
+  `arcInviteItem` is set, like the sidebar's "Coming from Arc?" card (skipping either clears both), done once Arc
+  Spaces came in (`importedArcSpacesItem`), else skipped.
   The page takes a `WelcomeClient` (`state/welcome.svelte.ts`; `pnpm proto`'s `/welcome.html` has a fake one). The
   e2e build doesn't open it on install: every test installs anew, and the tab would show in every strip they check.
 - **Copy the current tab's link** (`copy-url`, unassigned: Chrome's four suggestions are taken): the worker can't write

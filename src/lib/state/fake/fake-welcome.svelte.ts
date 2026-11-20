@@ -10,8 +10,8 @@ export class FakeWelcomeClient implements WelcomeClient {
   side = $state<PanelSide | null>('right');
   sideKept = $state(false);
   onToolbar = $state(false);
-  archiveAfterHours = $state(12);
   arcInvite = $state(true);
+  arcImported = $state(false);
   readonly shortcuts: readonly KeyboardShortcut[] = [
     { name: 'toggle-sidebar', description: 'Show or hide the sidebar', keys: '⌃B', defaultKeys: 'Ctrl+B' },
     { name: 'open-palette', description: 'Search tabs, pins and archived tabs', keys: '⌃M', defaultKeys: 'Ctrl+M' },
@@ -35,10 +35,6 @@ export class FakeWelcomeClient implements WelcomeClient {
     this.sideKept = true;
   }
 
-  editShortcuts(): void {
-    console.info("[proto] Chrome's shortcuts page would open here.");
-  }
-
   openSettings(): void {
     console.info('[proto] The settings page would open here.');
   }
@@ -46,7 +42,9 @@ export class FakeWelcomeClient implements WelcomeClient {
   async refresh(): Promise<void> {}
 
   openImport(): void {
-    console.info('[proto] The import page would open here.');
+    console.info('[proto] The import page would open here; this acts as if Spaces came in.');
+    this.arcImported = true;
+    this.arcInvite = false;
   }
 
   dismissArc(): void {

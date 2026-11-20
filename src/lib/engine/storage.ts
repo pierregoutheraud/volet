@@ -48,7 +48,10 @@ export const autoTitlesItem = storage.defineItem<Record<string, string>>('local:
 export const lastPagesItem = storage.defineItem<Record<string, string>>('local:lastPages', { fallback: {} });
 /** Ids of the Arc Spaces imported on this device. */
 export const importedArcSpacesItem = storage.defineItem<string[]>('local:importedArcSpaces', { fallback: [] });
-/** Show the "Coming from Arc?" card: set on install, cleared when dismissed or once something is imported. */
+/**
+ * Offer the Arc import (the sidebar's "Coming from Arc?" card, the welcome page's optional step): set on install,
+ * cleared when either is dismissed or once something is imported.
+ */
 export const arcInviteItem = storage.defineItem<boolean>('local:arcInvite', { fallback: false });
 /** The welcome page's "Keep it on the right": the panel's side is settled even though it isn't on the left. */
 export const panelSideKeptItem = storage.defineItem<boolean>('local:panelSideKept', { fallback: false });

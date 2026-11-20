@@ -32,8 +32,8 @@ export default defineBackground(() => {
   };
   browser.runtime.onInstalled.addListener(({ reason }) => {
     if (reason === 'install') {
-      // A first install greets people coming from Arc (the "Coming from Arc?" cards, in the sidebar and the welcome
-      // page), and opens the welcome page, as the panel can't open itself. Not in e2e tests: each one installs anew,
+      // A first install greets people coming from Arc (the sidebar's "Coming from Arc?" card, the welcome page's Arc
+      // step), and opens the welcome page, as the panel can't open itself. Not in e2e tests: each one installs anew,
       // and the extra tab would show up in every tab strip they check.
       arcInviteItem.setValue(true).catch(log('arc invite'));
       if (import.meta.env.MODE !== 'e2e') queue('welcome', openWelcome);

@@ -1,15 +1,8 @@
 import { browser } from 'wxt/browser';
-import {
-  DEFAULT_SETTINGS,
-  arcInviteItem,
-  completeSettings,
-  openPanelsItem,
-  panelSideKeptItem,
-  settingsItem,
-} from '@/lib/engine/storage';
+import { arcInviteItem, importedArcSpacesItem, openPanelsItem, panelSideKeptItem } from '@/lib/engine/storage';
 import type { KeyboardShortcut } from '@/lib/model/keyboard-shortcuts';
 import { type PanelSide, WELCOME_SHORTCUTS, type WelcomeClient } from '@/lib/model/welcome';
-import { editShortcuts, readShortcuts } from './shortcuts';
+import { readShortcuts } from './shortcuts';
 
 /**
  * The welcome page's data, read from Chrome. What the user changes in Chrome's own UI (the panel's side, the pinned
@@ -22,28 +15,28 @@ export class ChromeWelcomeClient implements WelcomeClient {
   sideKept = $state(false);
   onToolbar = $state(false);
   shortcuts = $state.raw<KeyboardShortcut[]>([]);
-  archiveAfterHours = $state(DEFAULT_SETTINGS.archiveAfterHours);
   arcInvite = $state(false);
+  arcImported = $state(false);
 
   /** The page's window, read ahead: `sidePanel.open` must run in the click itself, with no await before it. */
   #windowId: number | undefined;
 
   async start(): Promise<void> {
-    const [openPanels, sideKept, settings, arcInvite] = await Promise.all([
+    const [openPanels, sideKept, arcInvite, imported] = await Promise.all([
       openPanelsItem.getValue(),
       panelSideKeptItem.getValue(),
-      settingsItem.getValue(),
       arcInviteItem.getValue(),
+      importedArcSpacesItem.getValue(),
       this.refresh(),
     ]);
     this.#seePanels(openPanels);
     this.sideKept = sideKept;
-    this.archiveAfterHours = completeSettings(settings).archiveAfterHours;
     this.arcInvite = arcInvite;
+    this.arcImported = imported.length > 0;
     openPanelsItem.watch((next) => this.#seePanels(next));
     panelSideKeptItem.watch((next) => (this.sideKept = next));
-    settingsItem.watch((next) => (this.archiveAfterHours = completeSettings(next).archiveAfterHours));
     arcInviteItem.watch((next) => (this.arcInvite = next));
+    importedArcSpacesItem.watch((next) => (this.arcImported = next.length > 0));
     // Chrome 130: the icon pinned or unpinned while the page shows.
     browser.action.onUserSettingsChanged?.addListener(({ isOnToolbar }) => {
       if (isOnToolbar !== undefined) this.onToolbar = isOnToolbar;
@@ -79,10 +72,6 @@ export class ChromeWelcomeClient implements WelcomeClient {
   keepSide(): void {
     this.sideKept = true;
     void panelSideKeptItem.setValue(true);
-  }
-
-  editShortcuts(): void {
-    void editShortcuts();
   }
 
   openSettings(): void {

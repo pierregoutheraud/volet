@@ -93,8 +93,8 @@ pnpm build
 
 Then open `chrome://extensions`, enable Developer mode, click "Load unpacked" and pick `output/chrome-mv3`.
 
-A first install opens a welcome page: open the sidebar, choose its side, pin the icon, and the basics. Find it again
-in Settings → Getting started.
+A first install opens a welcome page: open the sidebar, choose its side, pin the icon, import from Arc if you're
+coming from it, and its main shortcuts. Find it again in Settings → Getting started.
 
 ## Development
 
