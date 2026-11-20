@@ -84,7 +84,7 @@ test('typing an address from the panel opens it in the active Volet', async ({ c
   await panel.keyboard.press('Enter');
   await expect
     .poll(async () => (await stripState(worker, windowId)).find((tab) => tab.url.includes('docs.example'))?.group)
-    .toBe('Volet 1 (click to rename)');
+    .toBe('Volet 1 (right-click to rename)');
 });
 
 test('arrows from the panel move through the results, and a click into Search carries on typing on the page', async ({ context, worker, windowId, panel }) => {

@@ -75,6 +75,8 @@ export interface SidebarStore {
   readonly openFolders: ReadonlySet<string>;
   /** Whether a collapsed folder still shows its pins with an open tab (a setting, on by default). */
   readonly collapsedFoldersShowOpenTabs: boolean;
+  /** Spaces whose pinned tabs are collapsed, like a folder (same rule for open tabs); every other Space shows them. */
+  readonly collapsedPins: ReadonlySet<SpaceId>;
 
   // Tabs
   activateTab(tabId: TabId): Done;
@@ -110,6 +112,8 @@ export interface SidebarStore {
    */
   createFolderWith(items: SpaceItem[], parentId: string, index?: number): Created;
   toggleFolder(folderId: string): Done;
+  /** Collapse or show a Space's pinned tabs (its name's caret). */
+  togglePins(spaceId: SpaceId): Done;
 
   // Favorites
   openFavorite(favoriteId: string): Done;

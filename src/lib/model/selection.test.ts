@@ -45,6 +45,14 @@ describe('pageEntries', () => {
     expect(pageEntries(space, new Set(), false)).toEqual([node('p1'), node('docs'), tab(1), tab(2)]);
     expect(pageEntries(space, new Set(['docs']), false)).toEqual(pageEntries(space));
   });
+
+  it("folds the Space's pinned tabs when collapsed: its open pins only, at any depth, and no folder rows", () => {
+    expect(pageEntries(space, new Set(['docs']), true, true)).toEqual([node('p1'), node('p2'), tab(1), tab(2)]);
+  });
+
+  it('shows no pinned tabs at all when collapsed and open tabs hide in collapsed folders', () => {
+    expect(pageEntries(space, new Set(['docs']), false, true)).toEqual([tab(1), tab(2)]);
+  });
 });
 
 describe('activeEntry', () => {

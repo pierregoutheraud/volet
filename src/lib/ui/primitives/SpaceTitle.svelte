@@ -1,29 +1,45 @@
 <script lang="ts">
+  import { ChevronRight } from '@lucide/svelte';
   import type { Snippet } from 'svelte';
+  import { prefersReducedMotion } from 'svelte/motion';
 
   interface Props {
     name: string;
-    /** Starts renaming (a click on the name; the Space menu offers "Rename Volet" too). */
-    onrename?: () => void;
+    /** The Space's pinned tabs are collapsed: the caret points right. */
+    collapsed: boolean;
+    /** Collapses or shows the pinned tabs (a click on the name; renaming is in the Space's menu). */
+    ontoggle: () => void;
     /** Replaces the name with an editor (e.g. a rename field). */
     editor?: Snippet;
   }
 
-  let { name, onrename, editor }: Props = $props();
+  let { name, collapsed, ontoggle, editor }: Props = $props();
 </script>
 
-<!-- 6px below, plus the 2px strip the list starts with (where a drop line before its first row shows). -->
-<h2 class="px-2.5 pb-1.5 font-display text-[19px] leading-tight font-bold tracking-[-0.01em]">
+<!-- 4px below, plus the 2px strip the list starts with (where a drop line before its first row shows). -->
+<h2 class="group/title pt-1 pr-2.5 pl-1 pb-1 font-display text-[19px] leading-tight font-bold tracking-[-0.01em]">
   {#if editor}
     {@render editor()}
   {:else}
-    <!-- The name is editable in place: a text cursor says so, and a click starts renaming. -->
+    <!-- The caret before the name says what a click does: fold the pinned tabs away, or bring them back. -->
     <button
       type="button"
-      class="block w-full cursor-text truncate rounded-md text-left"
-      onclick={onrename}
+      class="flex w-full min-w-0 items-center gap-1.5 rounded-md text-left"
+      aria-expanded={!collapsed}
+      onclick={ontoggle}
     >
-      {name}
+      <ChevronRight
+        size={15}
+        strokeWidth={2.25}
+        aria-hidden="true"
+        class={[
+          'pointer-events-none flex-none text-ink-muted group-hover/title:text-ink',
+          'group-data-hovered/title:text-ink',
+          !prefersReducedMotion.current && 'transition-transform duration-150',
+          !collapsed && 'rotate-90',
+        ]}
+      />
+      <span class="truncate">{name}</span>
     </button>
   {/if}
 </h2>

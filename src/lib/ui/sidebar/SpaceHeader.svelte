@@ -29,7 +29,8 @@
 <ContextMenu items={() => spaceMenu(space, menus)}>
   <SpaceTitle
     name={space.name}
+    collapsed={sidebar.collapsedPins.has(space.id)}
+    ontoggle={() => void sidebar.togglePins(space.id)}
     editor={rename.is(key) ? editor : undefined}
-    onrename={() => rename.start(key)}
   />
 </ContextMenu>

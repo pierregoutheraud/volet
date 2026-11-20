@@ -18,7 +18,7 @@ async function openTabs(worker: Worker, windowId: number, titles: string[]) {
 const homeId = (worker: Worker) =>
   worker.evaluate(async () => {
     const { root } = (await chrome.storage.local.get('root')) as { root: { rootId: string } };
-    return (await chrome.bookmarks.getChildren(root.rootId)).find((c) => c.title === 'Volet 1 (click to rename)')!.id;
+    return (await chrome.bookmarks.getChildren(root.rootId)).find((c) => c.title === 'Volet 1 (right-click to rename)')!.id;
   });
 
 type Tree = { title: string; url?: string; children?: Tree[] };
@@ -26,7 +26,7 @@ type Tree = { title: string; url?: string; children?: Tree[] };
 const homeOutline = async (worker: Worker) => {
   const outline = (nodes: Tree[]): unknown[] =>
     nodes.map((node) => (node.children ? { [node.title]: outline(node.children) } : node.title));
-  return outline((await bookmarkTree(worker)).children!.find((c) => c.title === 'Volet 1 (click to rename)')!.children!);
+  return outline((await bookmarkTree(worker)).children!.find((c) => c.title === 'Volet 1 (right-click to rename)')!.children!);
 };
 
 const tabTitle = (url: string) => url.match(/<title>(\w+)/)?.[1];

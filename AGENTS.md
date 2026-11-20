@@ -151,6 +151,9 @@ Three layers, each with a single job. Dependencies point downward only.
   as it changes; `pageEntries` follows it for the page order). Those slides are local transitions on purpose, so rows
   added or removed for other reasons (drags, optimistic ids) just appear. Settings saved before a setting existed
   lack it: read them through `completeSettings`.
+  A Space's whole pinned section folds the same way, from its name (`SpaceTitle`'s caret; renaming a Space is in its
+  right-click menu): the top-level `PinnedList` renders `folded` (`collapsedPinsItem`, per device, written directly
+  from the panel like open folders; `SidebarStore.collapsedPins`, `pageEntries`' `pinsCollapsed`).
 - **Volet switcher**: there's no limit on Volets; every tab group in Chrome is one, so a first run starts with the
   user's groups. Each one is a shutter (`SpaceDot`, a volet; the code still calls them dots): closed, a small panel in
   its color with its initial (`spaceInitial`); the active one opens into a pill with its name, its width animating

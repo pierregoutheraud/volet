@@ -17,6 +17,7 @@ export class FakeSidebarStore implements SidebarStore {
   activeTabId = $state<TabId | undefined>(21);
   openFolders = $state.raw<ReadonlySet<string>>(seedOpenFolders());
   collapsedFoldersShowOpenTabs = $state(true);
+  collapsedPins = $state.raw<ReadonlySet<SpaceId>>(new Set());
 
   #nextId = 1000;
   /** Not reactive on purpose: only read when switching Spaces. */
@@ -132,6 +133,10 @@ export class FakeSidebarStore implements SidebarStore {
 
   toggleFolder(folderId: string) {
     this.openFolders = tree.toggled(this.openFolders, folderId);
+  }
+
+  togglePins(spaceId: SpaceId) {
+    this.collapsedPins = tree.toggled(this.collapsedPins, spaceId);
   }
 
   // ───────────────────────────── favorites ─────────────────────────────

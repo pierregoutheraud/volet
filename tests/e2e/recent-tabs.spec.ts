@@ -857,7 +857,7 @@ test('screenshots are kept in Chrome session storage, so they outlive the backgr
 
 test('the switcher follows the system color scheme and takes the active Volet\'s color, like the panel', async ({ context, worker, windowId, panel }) => {
   // Give the window's Volet a color other than the switcher's default (268, the first Volet's).
-  const spaceId = await worker.evaluate(async () => (await chrome.bookmarks.search({ title: 'Volet 1 (click to rename)' }))[0]!.id);
+  const spaceId = await worker.evaluate(async () => (await chrome.bookmarks.search({ title: 'Volet 1 (right-click to rename)' }))[0]!.id);
   expect((await command(panel, { type: 'setSpaceHue', spaceId, hue: 150 })).ok).toBe(true);
   const hueOf = (target: Locator) => target.evaluate((element) => (element as HTMLElement).style.getPropertyValue('--space-hue'));
   await expect.poll(() => hueOf(panel.locator('.sidebar'))).toBe('150');

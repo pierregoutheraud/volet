@@ -40,5 +40,5 @@ export interface RootIds {
 /** The bookmark folder holding everything (named after the extension, so it's clear what it's for). */
 export const ROOT_TITLE = 'Volet';
 export const FAVORITES_TITLE = 'Favorites';
-export const DEFAULT_SPACE_NAME = 'Volet 1 (click to rename)';
+export const DEFAULT_SPACE_NAME = 'Volet 1 (right-click to rename)';
 export const ARCHIVE_LIMIT = 500;

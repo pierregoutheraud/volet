@@ -16,7 +16,7 @@ async function dashboard(worker: Worker, windowId: number, panel: Page) {
   await expect(row(panel, 'Gamma')).toBeVisible();
   const home = await worker.evaluate(async () => {
     const { root } = (await chrome.storage.local.get('root')) as { root: { rootId: string } };
-    return (await chrome.bookmarks.getChildren(root.rootId)).find((c) => c.title === 'Volet 1 (click to rename)')!.id;
+    return (await chrome.bookmarks.getChildren(root.rootId)).find((c) => c.title === 'Volet 1 (right-click to rename)')!.id;
   });
   const items = ids.map((id) => ({ kind: 'tab', id }));
   await command(panel, { type: 'createFolderWith', windowId, parentId: home, title: 'Dashboard', items });
@@ -50,6 +50,48 @@ test('a collapsed folder still shows its open tabs', async ({ worker, windowId, 
   await expect(row(panel, 'Gamma')).toHaveCount(0);
   await expect(row(panel, 'Alpha')).toBeVisible();
   await expect(row(panel, 'Beta')).toBeVisible();
+});
+
+test("a Volet's name collapses its pinned tabs like a folder, and they stay collapsed", async ({ worker, windowId, panel }) => {
+  await dashboard(worker, windowId, panel);
+  const home = await worker.evaluate(async () => {
+    const { root } = (await chrome.storage.local.get('root')) as { root: { rootId: string } };
+    return (await chrome.bookmarks.getChildren(root.rootId)).find((c) => c.title === 'Volet 1 (right-click to rename)')!.id;
+  });
+  const title = () => visiblePage(panel).getByRole('heading').getByRole('button');
+  await expect(title()).toHaveAttribute('aria-expanded', 'true');
+
+  await title().click();
+  await expect(title()).toHaveAttribute('aria-expanded', 'false');
+  // Like a collapsed folder: the folder row and the closed pin go, the pins with an open tab stay.
+  await expect(row(panel, 'Dashboard')).toHaveCount(0);
+  await expect(row(panel, 'Gamma')).toHaveCount(0);
+  await expect(row(panel, 'Alpha')).toBeVisible();
+  await expect(row(panel, 'Beta')).toBeVisible();
+  await expect
+    .poll(() => worker.evaluate(async () => (await chrome.storage.local.get('collapsedPins')).collapsedPins))
+    .toEqual([home]);
+
+  // Remembered on this device: a panel opened again starts collapsed.
+  await panel.reload();
+  await expect(title()).toHaveAttribute('aria-expanded', 'false');
+  await expect(row(panel, 'Alpha')).toBeVisible();
+  await expect(row(panel, 'Gamma')).toHaveCount(0);
+
+  await title().click();
+  await expect(title()).toHaveAttribute('aria-expanded', 'true');
+  await expect(row(panel, 'Dashboard')).toBeVisible();
+  await expect(row(panel, 'Gamma')).toBeVisible();
+});
+
+test("collapsing a Volet's pinned tabs hides their open tabs too when the setting says so", async ({ worker, windowId, panel }) => {
+  await dashboard(worker, windowId, panel);
+  // What Volet's settings page saves for "Show open tabs in collapsed folders" off.
+  await worker.evaluate(() =>
+    chrome.storage.sync.set({ settings: { archiveAfterHours: 12, collapsedFoldersShowOpenTabs: false } }),
+  );
+  await visiblePage(panel).getByRole('heading').getByRole('button').click();
+  for (const name of ['Dashboard', 'Alpha', 'Beta', 'Gamma']) await expect(row(panel, name)).toHaveCount(0);
 });
 
 test("Volet's settings can hide a collapsed folder's open tabs too, and the panel follows at once", async ({ context, worker, windowId, panel }) => {
@@ -87,7 +129,7 @@ test("double-clicking a folder doesn't rename it; its menu does", async ({ worke
   await expect(row(panel, 'Inside')).toBeVisible();
   const home = await worker.evaluate(async () => {
     const { root } = (await chrome.storage.local.get('root')) as { root: { rootId: string } };
-    return (await chrome.bookmarks.getChildren(root.rootId)).find((c) => c.title === 'Volet 1 (click to rename)')!.id;
+    return (await chrome.bookmarks.getChildren(root.rootId)).find((c) => c.title === 'Volet 1 (right-click to rename)')!.id;
   });
   await command(panel, { type: 'createFolderWith', windowId, parentId: home, title: 'Dashboard', items: [{ kind: 'tab', id: tabId }] });
   const folder = row(panel, 'Dashboard');
@@ -112,7 +154,7 @@ test('a folder Volet didn\'t make starts collapsed; opening it shows its many pi
 }) => {
   await worker.evaluate(async () => {
     const { root } = (await chrome.storage.local.get('root')) as { root: { rootId: string } };
-    const home = (await chrome.bookmarks.getChildren(root.rootId)).find((c) => c.title === 'Volet 1 (click to rename)')!.id;
+    const home = (await chrome.bookmarks.getChildren(root.rootId)).find((c) => c.title === 'Volet 1 (right-click to rename)')!.id;
     const folder = await chrome.bookmarks.create({ parentId: home, title: 'Archive' });
     for (let i = 1; i <= 60; i++) await chrome.bookmarks.create({ parentId: folder.id, title: `Page ${i}`, url: `https://p${i}.example/` });
   });

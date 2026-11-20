@@ -53,7 +53,7 @@ test('importing an Arc sidebar creates its Spaces, pins, folders and favorites',
   const tree = await bookmarkTree(worker);
   expect(tree.children).toEqual([
     { title: 'Favorites', children: [{ title: 'Mail', url: 'https://mail.example/' }] },
-    { title: 'Volet 1 (click to rename)', children: [] },
+    { title: 'Volet 1 (right-click to rename)', children: [] },
     {
       title: 'Studio',
       children: [

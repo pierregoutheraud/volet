@@ -33,6 +33,8 @@ export const openPanelsItem = storage.defineItem<Record<string, true>>('session:
 export const rootItem = storage.defineItem<RootIds | null>('local:root', { fallback: null });
 /** Folders shown open. Every other folder is collapsed: one Volet didn't make (an import, a reinstall, Chrome's bookmarks, sync). */
 export const openFoldersItem = storage.defineItem<string[]>('local:openFolders', { fallback: [] });
+/** Spaces whose pinned tabs are collapsed (from the Space's name). Every other Space shows them. */
+export const collapsedPinsItem = storage.defineItem<string[]>('local:collapsedPins', { fallback: [] });
 export const archiveItem = storage.defineItem<ArchiveEntry[]>('local:archive', { fallback: [] });
 /** Arc's sidebar as last read from its file (by the import page, or the panel when it may re-read it). */
 export const arcSidebarItem = storage.defineItem<ImportedSidebar | null>('local:arcSidebar', { fallback: null });

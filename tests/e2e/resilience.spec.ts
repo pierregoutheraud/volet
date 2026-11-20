@@ -23,8 +23,8 @@ test('each window shows its own Space', async ({ context, worker, windowId, pane
   await expect
     .poll(async () => (await stripState(worker, secondWindow)).every((tab) => tab.group !== null))
     .toBe(true);
-  await secondPanel.getByRole('navigation', { name: 'Volets' }).getByRole('button', { name: 'Volet 1 (click to rename)' }).click();
-  await expect(secondPanel.locator('section:not([inert])').getByRole('heading')).toHaveText('Volet 1 (click to rename)');
+  await secondPanel.getByRole('navigation', { name: 'Volets' }).getByRole('button', { name: 'Volet 1 (right-click to rename)' }).click();
+  await expect(secondPanel.locator('section:not([inert])').getByRole('heading')).toHaveText('Volet 1 (right-click to rename)');
 
   // Switching the second window doesn't move the first one.
   await expect(panel.locator('section:not([inert])').getByRole('heading')).toHaveText('Volet 2');
@@ -46,11 +46,11 @@ test.describe('after a browser restart', () => {
       windowId,
     );
     await expect.poll(() => worker.evaluate(async (id) => (await chrome.tabs.get(id)).title, tabId)).toBe('Survivor');
-    await expect.poll(async () => (await stripState(worker, windowId)).find((t) => t.id === tabId)?.group).toBe('Volet 1 (click to rename)');
+    await expect.poll(async () => (await stripState(worker, windowId)).find((t) => t.id === tabId)?.group).toBe('Volet 1 (right-click to rename)');
     const panel = await openPanel(context, worker, windowId);
     const homeId = await worker.evaluate(async () => {
       const { root } = (await chrome.storage.local.get('root')) as { root: { rootId: string } };
-      return (await chrome.bookmarks.getChildren(root.rootId)).find((c) => c.title === 'Volet 1 (click to rename)')!.id;
+      return (await chrome.bookmarks.getChildren(root.rootId)).find((c) => c.title === 'Volet 1 (right-click to rename)')!.id;
     });
     await command(panel, { type: 'pinTab', windowId, tabId, parentId: homeId });
     await panel.close();
@@ -78,7 +78,7 @@ test.describe('after a browser restart', () => {
           }),
         { timeout: 20_000 },
       )
-      .toBe('pin in Volet 1 (click to rename)');
+      .toBe('pin in Volet 1 (right-click to rename)');
     await context.close();
   });
 
@@ -110,11 +110,11 @@ test.describe('after a browser restart', () => {
 
     const pinTab = await open(home('pin'));
     await expect.poll(() => urlOf(pinTab)).toBe(home('pin'));
-    await expect.poll(async () => (await stripState(worker, windowId)).find((t) => t.id === pinTab)?.group).toBe('Volet 1 (click to rename)');
+    await expect.poll(async () => (await stripState(worker, windowId)).find((t) => t.id === pinTab)?.group).toBe('Volet 1 (right-click to rename)');
     const panel = await openPanel(context, worker, windowId);
     const homeId = await worker.evaluate(async () => {
       const { root } = (await chrome.storage.local.get('root')) as { root: { rootId: string } };
-      return (await chrome.bookmarks.getChildren(root.rootId)).find((c) => c.title === 'Volet 1 (click to rename)')!.id;
+      return (await chrome.bookmarks.getChildren(root.rootId)).find((c) => c.title === 'Volet 1 (right-click to rename)')!.id;
     });
     await command(panel, { type: 'pinTab', windowId, tabId: pinTab, parentId: homeId });
     await goTo(pinTab, away('pin'));

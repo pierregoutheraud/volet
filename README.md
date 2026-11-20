@@ -14,6 +14,7 @@ A rewrite inspired by [Arcify](https://github.com/nisargkolhe/arcify) (GPL-3.0),
 - **Pinned tabs and folders.** Pins keep their home page: navigate away and the row shows where you are, with a button back.
   On hover, × closes the tab (the pin stays, dimmed) and the pin-off button unpins it in one click (it becomes a
   regular tab below the divider). Folders nest; a collapsed folder still shows its open tabs (Settings can hide them too).
+  Click a Space's name to collapse all its pinned tabs and folders the same way, leaving the tabs below the divider.
 - **Temporary tabs** sit below the divider. "Clear" closes them all. Unused ones are archived after 12 hours (configurable)
   and can be found again in search.
 - **Favorites.** The grid at the top, shared by all Spaces. Open favorites are Chrome's own pinned tabs, so anything you pin
@@ -25,8 +26,8 @@ A rewrite inspired by [Arcify](https://github.com/nisargkolhe/arcify) (GPL-3.0),
 - **Select several rows** like in Chrome's tab strip: <kbd>Shift</kbd>+click selects a range, <kbd>⌘</kbd>/<kbd>Ctrl</kbd>+click
   adds or removes one, <kbd>Esc</kbd> clears. Drag them together (they move as a stack), or right-click to put them in a new
   folder (a selected folder nests inside it), move them to another Space, or close them. A click anywhere else clears it.
-- **Right-click menus** on every tab, pin, folder, favorite and Space: rename (or double-click a pin or folder, click a
-  Space's name), move to another Space, put a tab in a new folder, add a new folder at the top of the Space (from a
+- **Right-click menus** on every tab, pin, folder, favorite and Space: rename (or double-click a pin or folder), move to
+  another Space, put a tab in a new folder, add a new folder at the top of the Space (from a
   pin, folder or the Space) or inside a folder, Space colors, reorder and delete Spaces, and more.
 - **Search palette.** Press <kbd>Ctrl</kbd>+<kbd>M</kbd> on any page for an Arc-style palette over it: open tabs (all windows),
   pins, favorites, archived tabs, Spaces, actions, a web address, or a web search. From the sidebar (the search button,

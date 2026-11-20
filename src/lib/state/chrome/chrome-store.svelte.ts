@@ -1,6 +1,12 @@
 import { EMPTY_STATE, derive, type SidebarState } from '@/lib/engine/derive';
 import type { Command } from '@/lib/engine/protocol';
-import { completeSettings, DEFAULT_SETTINGS, openFoldersItem, settingsItem } from '@/lib/engine/storage';
+import {
+  collapsedPinsItem,
+  completeSettings,
+  DEFAULT_SETTINGS,
+  openFoldersItem,
+  settingsItem,
+} from '@/lib/engine/storage';
 import type { Favorite, Folder, LiveTab, SidebarStore, Space, SpaceId, SpaceItem, TabId } from '@/lib/model/types';
 import { reuseContent } from '../reuse';
 import * as tree from '../tree';
@@ -25,6 +31,8 @@ export class ChromeSidebarStore implements SidebarStore {
   openFolders = $state.raw<ReadonlySet<string>>(EMPTY_STATE.openFolders);
   /** A display setting, followed from Volet's settings as they change; no reload needed. */
   collapsedFoldersShowOpenTabs = $state(DEFAULT_SETTINGS.collapsedFoldersShowOpenTabs);
+  /** Purely visual and per device too, followed as it changes (other panels write it): no reload needed. */
+  collapsedPins = $state.raw<ReadonlySet<SpaceId>>(new Set());
 
   readonly windowId: number;
   #gate: RefreshGate<SidebarState>;
@@ -46,6 +54,9 @@ export class ChromeSidebarStore implements SidebarStore {
     };
     settingsItem.watch(showSettings);
     void settingsItem.getValue().then(showSettings).catch(() => undefined);
+    const showCollapsedPins = (ids: string[]) => (this.collapsedPins = new Set(ids));
+    collapsedPinsItem.watch(showCollapsedPins);
+    void collapsedPinsItem.getValue().then(showCollapsedPins).catch(() => undefined);
     watchWindow(this.windowId, {
       onChange: () => this.#scheduleRefresh(),
       onTabUpdated: (tabId, change, live) => {
@@ -208,6 +219,12 @@ export class ChromeSidebarStore implements SidebarStore {
     this.openFolders = tree.toggled(this.openFolders, folderId);
     // Purely visual state: written directly, no need for the service worker.
     await openFoldersItem.setValue([...this.openFolders]);
+  }
+
+  async togglePins(spaceId: SpaceId) {
+    this.collapsedPins = tree.toggled(this.collapsedPins, spaceId);
+    // Purely visual state, like open folders: written directly.
+    await collapsedPinsItem.setValue([...this.collapsedPins]);
   }
 
   // ───────────────────────────── favorites ─────────────────────────────

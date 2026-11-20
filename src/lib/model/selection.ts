@@ -6,21 +6,25 @@ import type { PinnedNode, Space, SpaceItem, TabId } from './types';
  * The entries of a Space's page, top to bottom: pins and folders, then temporary tabs.
  * A folder's contents follow it when it is in `open`; a collapsed folder still shows the pins
  * whose tab is open, unless `openTabsInCollapsed` is off (a setting). Pass no `open` set to list
- * everything.
+ * everything. With `pinsCollapsed` (the Space's pinned tabs collapsed from its name), the pinned
+ * part folds the same way: its open pins only, or none, and no folder rows.
  */
-export function pageEntries(space: Space, open?: ReadonlySet<string>, openTabsInCollapsed = true): SpaceItem[] {
+export function pageEntries(
+  space: Space,
+  open?: ReadonlySet<string>,
+  openTabsInCollapsed = true,
+  pinsCollapsed = false,
+): SpaceItem[] {
+  const pins = (nodes: PinnedNode[]): SpaceItem[] =>
+    openTabsInCollapsed ? openPinsIn(nodes).map((pin): SpaceItem => ({ kind: 'node', id: pin.id })) : [];
   const walk = (nodes: PinnedNode[]): SpaceItem[] =>
     nodes.flatMap((node): SpaceItem[] => {
       if (node.kind === 'pin') return [{ kind: 'node', id: node.id }];
       const collapsed = open && !open.has(node.id);
-      const inside = !collapsed
-        ? walk(node.children)
-        : openTabsInCollapsed
-          ? openPinsIn(node.children).map((pin): SpaceItem => ({ kind: 'node', id: pin.id }))
-          : [];
-      return [{ kind: 'node', id: node.id }, ...inside];
+      return [{ kind: 'node', id: node.id }, ...(collapsed ? pins(node.children) : walk(node.children))];
     });
-  return [...walk(space.pinned), ...space.tabIds.map((id): SpaceItem => ({ kind: 'tab', id }))];
+  const pinned = pinsCollapsed ? pins(space.pinned) : walk(space.pinned);
+  return [...pinned, ...space.tabIds.map((id): SpaceItem => ({ kind: 'tab', id }))];
 }
 
 /** The page entry showing the active tab: a temporary tab or a pin. */
