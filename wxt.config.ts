@@ -11,7 +11,12 @@ export default defineConfig({
   dev: { server: { port: 3311, strictPort: true } },
   // `pnpm dev` opens a fresh Chrome profile with the extension loaded.
   // `pnpm dev:own` skips that: load output/chrome-mv3-dev once in your own profile instead.
-  webExt: { disabled: process.env.OWN_PROFILE === '1' },
+  webExt: {
+    disabled: process.env.OWN_PROFILE === '1',
+    // Chrome's Settings > Appearance > Mode, for that profile: 1 is Light (2 Dark, 0 follows the system). It themes
+    // Chrome and what pages see as prefers-color-scheme, the panel included.
+    chromiumPref: { browser: { theme: { color_scheme2: 1 } } },
+  },
   vite: () => ({
     plugins: [tailwindcss()],
   }),
